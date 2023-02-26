@@ -1,0 +1,104 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+
+pkgname=sonarr-dev
+pkgver=4.0.0.391
+_commit=6082253166b67d59d7907d83c362116d47bcdaeb
+pkgrel=0
+pkgdesc="TV download automation for usenet and torrents."
+url="https://github.com/Sonarr/Sonarr"
+arch="x86_64 aarch64 armv7"
+license="GPL-3.0-only"
+options="net !check" # no tests
+depends="
+	aspnetcore6-runtime
+	ffmpeg
+	sqlite-libs
+"
+makedepends="
+	dotnet6-sdk
+	yarn
+"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/Sonarr/Sonarr/archive/$_commit.tar.gz
+	sonarr.initd
+	sonarr.confd
+	package_info
+"
+builddir="$srcdir/Sonarr-$_commit"
+pkgusers="sonarr"
+pkggroups="sonarr"
+
+# map arch to dotnet
+case $CARCH in
+	x86_64) _dotnet_arch="x64" ;;
+	aarch64) _dotnet_arch="arm64" ;;
+	armv7) _dotnet_arch="arm" ;;
+	*) _dotnet_arch="$CARCH" ;;
+esac
+
+# custom variables
+_runtime="linux-musl-$_dotnet_arch"
+_framework="net6.0"
+_output="$builddir/_output"
+_artifacts="$_output/$_framework/$_runtime/publish"
+
+prepare() {
+	default_prepare
+
+	# increase max opened files
+	ulimit -n 4096
+
+	# replace version info
+	local buildprops="$builddir"/src/Directory.Build.props
+	sed -i -e "s/<AssemblyVersion>[0-9.*]\+<\/AssemblyVersion>/<AssemblyVersion>$pkgver<\/AssemblyVersion>/g" "$buildprops"
+	sed -i -e "s/<AssemblyConfiguration>[\$()A-Za-z-]\+<\/AssemblyConfiguration>/<AssemblyConfiguration>develop<\/AssemblyConfiguration>/g" "$buildprops"
+}
+
+build() {
+	# build the package
+	dotnet build "$builddir"/src \
+		-p:RuntimeIdentifiers="$_runtime" \
+		-p:Configuration=Release \
+		-p:SelfContained=false \
+		-t:PublishAllRids
+
+	# remove service helpers
+	rm -f "$_artifacts"/ServiceUninstall.*
+	rm -f "$_artifacts"/ServiceInstall.*
+	# remove Sonarr.Windows
+	rm -f "$_artifacts"/Sonarr.Windows.*
+
+	# build web ui
+	export BROWSERSLIST_IGNORE_OLD_DATA=true
+	yarn --cwd "$builddir" install --frozen-lockfile --network-timeout 120000
+	yarn --cwd "$builddir" build --env production --no-stats
+
+	# move web ui to artifacts folder
+	mv "$_output"/UI "$_artifacts"
+}
+
+package() {
+	local DESTDIR="$pkgdir"/usr/lib/sonarr
+
+	# use package_info to disable update feature
+	install -Dm644 "$srcdir"/package_info "$DESTDIR"/package_info
+	echo "PackageVersion=$pkgver-$pkgrel" >>"$DESTDIR"/package_info
+
+	cp -af "$_artifacts" "$DESTDIR"/bin
+	# use ffprobe from ffmpeg package
+	ln -sf /usr/bin/ffprobe "$DESTDIR"/bin
+	chown -R "$pkgusers:$pkggroups" "$DESTDIR"
+
+	install -Dm755 "$srcdir"/sonarr.initd "$pkgdir"/etc/init.d/sonarr
+	install -Dm644 "$srcdir"/sonarr.confd "$pkgdir"/etc/conf.d/sonarr
+}
+
+sha512sums="
+3604e41b03da27c4e720b49800027dbc8545f3db57364ce498b496faf4a63001f57980b5ceaf72a045944af7706afb15f0f1e2bad0ef0aa63df5ebf6402a562d  sonarr-dev-4.0.0.391.tar.gz
+1a4800fae4bcfad2ca12b03cc133bee29a161e1bc9d7bf789f519d69aa4dfeff1ee9830cc4836f9fd5525062472c76ad341e9ac366af42d2e6149ede3c9e7dc8  sonarr.initd
+2b6e9089bc3460b4df207d9b44895251a53aaf884e6f475ba79bf04ae6a2c992743b3dca32000e998d4ca77f444b0055dfcfe82422123a98232c879a9115b081  sonarr.confd
+67c4dd1cf8259296d994c350dfd3962d23333071889ce0b4ef6b2f4cbb4349490c5dbe4dcc202c99bab7a5c4b7611be56d7c8835b2b13924526c45311db1c3fb  package_info
+"

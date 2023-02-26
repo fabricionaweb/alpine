@@ -1,0 +1,5 @@
+# Sonarr configuration options
+
+command_user="sonarr:sonarr" # user:group
+directory="/var/lib/sonarr"
+umask=0002

@@ -1,0 +1,104 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+
+pkgname=whisparr-dev
+pkgver=2.0.0.131
+_commit=03cdb2d48296dad3eba95aa99a418c067feb2e20
+pkgrel=0
+pkgdesc="Adult download automation for usenet and torrents."
+url="https://github.com/Whisparr/Whisparr"
+arch="x86_64 aarch64 armv7"
+license="GPL-3.0-only"
+options="net !check" # no tests
+depends="
+	aspnetcore6-runtime
+	ffmpeg
+	sqlite-libs
+"
+makedepends="
+	dotnet6-sdk
+	yarn
+"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/Whisparr/Whisparr/archive/$_commit.tar.gz
+	whisparr.initd
+	whisparr.confd
+	package_info
+"
+builddir="$srcdir/Whisparr-$_commit"
+pkgusers="whisparr"
+pkggroups="whisparr"
+
+# map arch to dotnet
+case $CARCH in
+  x86_64) _dotnet_arch="x64" ;;
+  aarch64) _dotnet_arch="arm64" ;;
+  armv7) _dotnet_arch="arm" ;;
+  *) _dotnet_arch="$CARCH" ;;
+esac
+
+# custom variables
+_runtime="linux-musl-$_dotnet_arch"
+_framework="net6.0"
+_output="$builddir/_output"
+_artifacts="$_output/$_framework/$_runtime/publish"
+
+prepare() {
+  default_prepare
+
+  # increase max opened files
+  ulimit -n 4096
+
+  # replace version info
+  local buildprops="$builddir"/src/Directory.Build.props
+  sed -i -e "s/<AssemblyVersion>[0-9.*]\+<\/AssemblyVersion>/<AssemblyVersion>$pkgver<\/AssemblyVersion>/g" "$buildprops"
+  sed -i -e "s/<AssemblyConfiguration>[\$()A-Za-z-]\+<\/AssemblyConfiguration>/<AssemblyConfiguration>develop<\/AssemblyConfiguration>/g" "$buildprops"
+}
+
+build() {
+  # build the package
+  dotnet build "$builddir"/src \
+    -p:RuntimeIdentifiers="$_runtime" \
+    -p:Configuration=Release \
+    -p:SelfContained=false \
+    -t:PublishAllRids
+
+  # remove service helpers
+  rm -f "$_artifacts"/ServiceUninstall.*
+  rm -f "$_artifacts"/ServiceInstall.*
+  # remove Whisparr.Windows
+  rm -f "$_artifacts"/Sonarr.Windows.*
+
+  # build web ui
+  export BROWSERSLIST_IGNORE_OLD_DATA=true
+  yarn --cwd "$builddir" install --frozen-lockfile --network-timeout 120000
+  yarn --cwd "$builddir" build --env production --no-stats
+
+  # move web ui to artifacts folder
+  mv "$_output"/UI "$_artifacts"
+}
+
+package() {
+  local DESTDIR="$pkgdir"/usr/lib/whisparr
+
+  # use package_info to disable update feature
+  install -Dm644 "$srcdir"/package_info "$DESTDIR"/package_info
+  echo "PackageVersion=$pkgver-$pkgrel" >>"$DESTDIR"/package_info
+
+  cp -af "$_artifacts" "$DESTDIR"/bin
+  # use ffprobe from ffmpeg package
+  ln -sf /usr/bin/ffprobe "$DESTDIR"/bin
+  chown -R "$pkgusers:$pkggroups" "$DESTDIR"
+
+  install -Dm755 "$srcdir"/whisparr.initd "$pkgdir"/etc/init.d/whisparr
+  install -Dm644 "$srcdir"/whisparr.confd "$pkgdir"/etc/conf.d/whisparr
+}
+
+sha512sums="
+2225f51ead95d1474ee967f4c92f5c7d7f116978e37d237df9e8af3177ef9b4c51835d81fce066a591ade0294894cf26765d651a01700f74b3429e1859ef6ba2  whisparr-dev-2.0.0.131.tar.gz
+679b86b6139476c741485656ee1752f09e64bd8682eb41caac898947923651895728964ac68eae24d93da3ce5e2ee445e7e9e3244ba884d2626453872891c796  whisparr.initd
+85060d24600dab4ba20b3ac0aca002782ffee3b70b7475291367c5944187ced7933f6d6abef3e012adaf384f679ef357057d3e1e9e924b08b9f7c5ff89daadf2  whisparr.confd
+7af490784f86afc563e7d4fcfa1daed84c08310c85d148afbd98befdd7174304a6e2b7c549ddaf7224be1713aef0f9435e6ed5c8ba353ac335131326632d6b55  package_info
+"

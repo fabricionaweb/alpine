@@ -21,6 +21,7 @@
 4.  Install the packages you want:
 
     - `sonarr-dev`
+    - `whisparr-dev`
 
 ### Others
 

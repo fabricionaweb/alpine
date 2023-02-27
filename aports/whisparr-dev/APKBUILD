@@ -2,8 +2,8 @@
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 
 pkgname=whisparr-dev
-pkgver=2.0.0.131
-_commit=03cdb2d48296dad3eba95aa99a418c067feb2e20
+pkgver=2.0.0.134
+_commit=f2a3e593857873a0399728bcd63099604cfdb01e
 pkgrel=0
 pkgdesc="Adult download automation for usenet and torrents."
 url="https://github.com/Whisparr/Whisparr"
@@ -97,7 +97,7 @@ package() {
 }
 
 sha512sums="
-2225f51ead95d1474ee967f4c92f5c7d7f116978e37d237df9e8af3177ef9b4c51835d81fce066a591ade0294894cf26765d651a01700f74b3429e1859ef6ba2  whisparr-dev-2.0.0.131.tar.gz
+e9c4099daa6edee74a88b4473acc1eae221fcba2fd5113b9f0247b6a0cbbf9fbfca7d102fe5331c9704048f3ca1511480b439de269ccbbd80c96cde7b000e710  whisparr-dev-2.0.0.134.tar.gz
 679b86b6139476c741485656ee1752f09e64bd8682eb41caac898947923651895728964ac68eae24d93da3ce5e2ee445e7e9e3244ba884d2626453872891c796  whisparr.initd
 85060d24600dab4ba20b3ac0aca002782ffee3b70b7475291367c5944187ced7933f6d6abef3e012adaf384f679ef357057d3e1e9e924b08b9f7c5ff89daadf2  whisparr.confd
 7af490784f86afc563e7d4fcfa1daed84c08310c85d148afbd98befdd7174304a6e2b7c549ddaf7224be1713aef0f9435e6ed5c8ba353ac335131326632d6b55  package_info

@@ -1,0 +1,38 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=py3-sabyenc
+_pkgname=sabctools # the package was renamed but still in beta
+pkgver=5.4.4
+pkgrel=0
+pkgdesc="C implementations of functions for use within SABnzbd"
+url="https://github.com/sabnzbd/sabctools"
+arch="all"
+license="LGPL-3.0-only"
+depends="python3"
+checkdepends="
+	py3-pytest
+	py3-chardet
+	"
+makedepends="
+	python3-dev
+	py3-setuptools
+	linux-headers
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/sabnzbd/sabctools/archive/v$pkgver.tar.gz"
+builddir="$srcdir/$_pkgname-$pkgver"
+
+build() {
+	python3 setup.py build
+}
+
+check() {
+	PYTHONPATH="$(echo $PWD/build/lib.*)" pytest
+}
+
+package() {
+	python3 setup.py install --skip-build --root="$pkgdir"
+}
+
+sha512sums="
+61876676082aade5f78d9688005e7890edf4d172eb7fe91a1e5c1ae23f109eebdf0e7808561e7a4fda065c9014ed54e6a8a92cba34737fb14d7adaa67124dfc0  py3-sabyenc-5.4.4.tar.gz
+"

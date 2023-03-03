@@ -1,0 +1,20 @@
+[project]
+name = "sabnzbd"
+dynamic = ["version", "dependencies"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["sabnzbd*"]
+
+[tool.setuptools.package-data]
+# before build you need:
+#   move "locale", "interfaces" and "email" to inside "sabnzbd"
+#   change the constants.py
+"*" = ["../SABnzbd.py", "locale/**", "interfaces/**", "email/**"]
+
+[tool.setuptools.dynamic]
+version = {attr = "sabnzbd.version.__version__"}
+dependencies = {file = "requirements.txt"}

@@ -1,0 +1,122 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=sabnzbd
+pkgver=3.7.2
+pkgrel=0
+pkgdesc="SABnzbd is a program to download binary files from Usenet servers."
+url="https://sabnzbd.org/"
+arch="noarch"
+license="GPL-2.0-or-later"
+options="net"
+depends="
+	python3
+	par2cmdline
+	p7zip
+	unrar
+
+	py3-sabyenc
+	py3-cheetah
+	py3-cffi
+	py3-cparser
+	py3-feedparser
+	py3-configobj
+	py3-cheroot
+	py3-six
+	py3-cherrypy
+	py3-jaraco.functools
+	py3-jaraco.collections
+	py3-jaraco.text
+	py3-jaraco.classes
+	py3-jaraco.context
+	py3-more-itertools
+	py3-zc.lockfile
+	py3-dateutil
+	py3-tempora
+	py3-tz
+	py3-sgmllib3k
+	py3-portend
+	py3-chardet
+	py3-pysocks
+	py3-puremagic
+	py3-guessit
+	py3-babelfish
+	py3-rebulk
+	py3-cryptography
+	py3-orjson
+"
+checkdepends="
+	py3-pip
+	py3-pytest
+	py3-virtualenv
+	py3-requests
+	py3-pkginfo
+	py3-pyfakefs
+	py3-werkzeug
+	py3-pytest-httpbin
+	py3-pytest-httpserver
+	py3-flaky
+	py3-xmltodict
+	py3-importlib-metadata
+	py3-lxml
+	black
+"
+makedepends="
+	py3-gpep517
+	py3-wheel
+"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/sabnzbd/sabnzbd/archive/$pkgver.tar.gz
+	0001-move-assets.patch
+	pyproject.toml
+	sabnzbd.initd
+	sabnzbd.confd
+"
+
+prepare() {
+	default_prepare
+
+	# patch version to tag alpine
+	sed -i "s/^\(__version__ =\).*/\1 \"$pkgver+alpine.r$pkgrel\"/" "$builddir"/sabnzbd/version.py
+
+	# translations
+	python3 "$builddir"/tools/make_mo.py
+
+	# copy build-system
+	cp "$srcdir"/pyproject.toml "$builddir"
+
+	# move the assets but left a copy for the tests...
+	cp -af "$builddir"/locale "$builddir"/interfaces "$builddir"/email "$builddir"/sabnzbd
+}
+
+build() {
+	gpep517 build-wheel --wheel-dir dist --output-fd 3 3>&1 >&2
+}
+
+check() {
+	python3 -m venv --clear --system-site-packages testenv
+
+	testenv/bin/python3 -m installer "$builddir"/dist/*.whl
+	# packages missing in alpine repository
+	testenv/bin/python3 -m pip install -U tavern tavalidate selenium
+
+	# skip the integration tests and version match (as we added alpine)
+	testenv/bin/python3 -m pytest -k 'not test_functional and not test_sabnzbd_version_match'
+}
+
+package() {
+	python3 -m installer --destdir="$pkgdir" "$builddir"/dist/*.whl
+
+	install -Dm644 "$builddir"/licenses/* -t "$pkgdir"/usr/share/licenses/$pkgname
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+623578b03c427a7d540daff68b77dcad012179060206e021fc4528fe74a15b4a1084b85a981aadad8500cb52ec86c5215091ea93e2cc44eed2f1b9788ee3413c  sabnzbd-3.7.2.tar.gz
+335c9931e8e6f21b6ecb8c30656830c4b83ddfef6bc8dd1f5c182bb528eb82deb2e88f94895a8c796bc9fedfd507ca57aeb9948535acfc8d1ec805aea7dcbf7d  0001-move-assets.patch
+0a9ca4f20740f2ea8c91618e87caaa782aa999aa490577792842dcb1ca3caa43d2cd60269486eebd8544bf7f1c197df96cb7ce0b42c1f9f6c2598f7201554def  pyproject.toml
+8202c15bad358cc87d0caf06239922aa56427013a3c45bc74283f51e2d69134c24e5d2b0657d8b70d47543fdfe13cd54c55a913feefd88fc2d933dc61e2c38aa  sabnzbd.initd
+30b1e593d5d70a821b9e3733d875bb4622faa68ff06779ae584fee8732ca3975ab0dba872fe62ea1eaad108dbf20cbfbc4888cd833ced7e887af882711c1fcf5  sabnzbd.confd
+"

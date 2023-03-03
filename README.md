@@ -22,6 +22,7 @@
 
     - `sonarr-dev`
     - `whisparr-dev`
+    - `sabnzbd`
 
 ### Others
 

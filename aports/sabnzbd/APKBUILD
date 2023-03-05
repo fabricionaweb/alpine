@@ -71,9 +71,6 @@ source="
 prepare() {
 	default_prepare
 
-	# patch version to tag alpine
-	sed -i "s/^\(__version__ =\).*/\1 \"$pkgver+alpine.r$pkgrel\"/" "$builddir"/sabnzbd/version.py
-
 	# translations
 	python3 "$builddir"/tools/make_mo.py
 }
@@ -84,8 +81,8 @@ check() {
 	# packages missing in alpine repository
 	testenv/bin/python3 -m pip install -U tavern tavalidate selenium
 
-	# skip the integration tests and version match (as we added alpine)
-	testenv/bin/python3 -m pytest -k 'not test_functional and not test_sabnzbd_version_match'
+	# skip the integration tests
+	testenv/bin/python3 -m pytest -k 'not test_functional'
 }
 
 package() {
@@ -105,6 +102,6 @@ package() {
 
 sha512sums="
 623578b03c427a7d540daff68b77dcad012179060206e021fc4528fe74a15b4a1084b85a981aadad8500cb52ec86c5215091ea93e2cc44eed2f1b9788ee3413c  sabnzbd-3.7.2.tar.gz
-9b92a1dd5d525ff2158c6c63304d153113be0c5abcf5aae51cf7b9526ecf5b43018395bba751c47fce11a2f962f4776d883f02ec7d0ccfe19838b33285ca06c7  sabnzbd.initd
+cdfa20f4ee3160c27711e846da1c9091ce22111fbdbbb7212291ea9f5d0c6b4e55fb473396e3aa1fb4bc92598c192bdf99ed0ae5ccd8f1c7df57506cde4fa32a  sabnzbd.initd
 711be72eb71b2d9bfb3405106e4e25540a15229c85f2a968edc6ec07b8d14d3007c0fa0bd56ab35557a98d6ae76fe6759b3ab8d11e51b3d4aaf1c31c740839c9  sabnzbd.confd
 "

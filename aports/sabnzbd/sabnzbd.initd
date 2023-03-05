@@ -7,8 +7,8 @@
 
 name=sabnzbd
 description="SABnzbd daemon"
-command="/usr/bin/python3"
-command_args="-m SABnzbd --config-file $directory/sabnzbd.ini $command_args"
+command="python3 /usr/lib/sabnzbd/SABnzbd.py"
+command_args="--config-file $directory/sabnzbd.ini $command_args"
 
 depend() {
 	need net

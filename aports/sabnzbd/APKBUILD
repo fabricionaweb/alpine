@@ -60,16 +60,10 @@ checkdepends="
 	py3-lxml
 	black
 "
-makedepends="
-	py3-gpep517
-	py3-wheel
-"
 subpackages="$pkgname-openrc"
 install="$pkgname.pre-install"
 source="
 	$pkgname-$pkgver.tar.gz::https://github.com/sabnzbd/sabnzbd/archive/$pkgver.tar.gz
-	0001-move-assets.patch
-	pyproject.toml
 	sabnzbd.initd
 	sabnzbd.confd
 "
@@ -82,22 +76,11 @@ prepare() {
 
 	# translations
 	python3 "$builddir"/tools/make_mo.py
-
-	# copy build-system
-	cp "$srcdir"/pyproject.toml "$builddir"
-
-	# move the assets but left a copy for the tests...
-	cp -af "$builddir"/locale "$builddir"/interfaces "$builddir"/email "$builddir"/sabnzbd
-}
-
-build() {
-	gpep517 build-wheel --wheel-dir dist --output-fd 3 3>&1 >&2
 }
 
 check() {
 	python3 -m venv --clear --system-site-packages testenv
 
-	testenv/bin/python3 -m installer "$builddir"/dist/*.whl
 	# packages missing in alpine repository
 	testenv/bin/python3 -m pip install -U tavern tavalidate selenium
 
@@ -106,7 +89,14 @@ check() {
 }
 
 package() {
-	python3 -m installer --destdir="$pkgdir" "$builddir"/dist/*.whl
+	local DESTDIR="$pkgdir"/usr/lib/sabnzbd
+
+	install -Dm755 "$builddir"/SABnzbd.py -t "$DESTDIR"
+	cp -af "$builddir"/sabnzbd \
+				 "$builddir"/email \
+				 "$builddir"/interfaces \
+				 "$builddir"/locale \
+				 "$DESTDIR"
 
 	install -Dm644 "$builddir"/licenses/* -t "$pkgdir"/usr/share/licenses/$pkgname
 	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
@@ -115,8 +105,6 @@ package() {
 
 sha512sums="
 623578b03c427a7d540daff68b77dcad012179060206e021fc4528fe74a15b4a1084b85a981aadad8500cb52ec86c5215091ea93e2cc44eed2f1b9788ee3413c  sabnzbd-3.7.2.tar.gz
-335c9931e8e6f21b6ecb8c30656830c4b83ddfef6bc8dd1f5c182bb528eb82deb2e88f94895a8c796bc9fedfd507ca57aeb9948535acfc8d1ec805aea7dcbf7d  0001-move-assets.patch
-0a9ca4f20740f2ea8c91618e87caaa782aa999aa490577792842dcb1ca3caa43d2cd60269486eebd8544bf7f1c197df96cb7ce0b42c1f9f6c2598f7201554def  pyproject.toml
-8202c15bad358cc87d0caf06239922aa56427013a3c45bc74283f51e2d69134c24e5d2b0657d8b70d47543fdfe13cd54c55a913feefd88fc2d933dc61e2c38aa  sabnzbd.initd
-30b1e593d5d70a821b9e3733d875bb4622faa68ff06779ae584fee8732ca3975ab0dba872fe62ea1eaad108dbf20cbfbc4888cd833ced7e887af882711c1fcf5  sabnzbd.confd
+9b92a1dd5d525ff2158c6c63304d153113be0c5abcf5aae51cf7b9526ecf5b43018395bba751c47fce11a2f962f4776d883f02ec7d0ccfe19838b33285ca06c7  sabnzbd.initd
+711be72eb71b2d9bfb3405106e4e25540a15229c85f2a968edc6ec07b8d14d3007c0fa0bd56ab35557a98d6ae76fe6759b3ab8d11e51b3d4aaf1c31c740839c9  sabnzbd.confd
 "

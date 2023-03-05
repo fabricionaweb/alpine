@@ -23,6 +23,7 @@
     - `sonarr-dev`
     - `whisparr-dev`
     - `sabnzbd`
+    - `autobrr`
 
 ### Others
 

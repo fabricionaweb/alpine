@@ -1,0 +1,5 @@
+# autobrr configuration options
+
+command_user="autobrr:autobrr" # user:group
+directory="/var/lib/autobrr"
+supervisor="supervise-daemon"

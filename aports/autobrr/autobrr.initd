@@ -1,0 +1,19 @@
+#!/sbin/openrc-run
+
+# fallback values for /etc/conf.d/autobrr
+: ${command_user:=autobrr:autobrr}
+: ${directory:=/var/lib/autobrr}
+
+name=autobrr
+description="autobrr daemon"
+command="/usr/bin/autobrr"
+command_args="--config=$directory"
+
+depend() {
+	need net
+	use dns logger
+}
+
+start_pre() {
+	checkpath -d -o "$command_user" "$directory"
+}

@@ -1,0 +1,53 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=autobrr
+pkgver=1.19.0
+pkgrel=0
+_commit=cec6809b346610dcaf46f919f6ca19d8d836fe4b
+pkgdesc="The modern download automation tool for torrents"
+url="https://autobrr.com/"
+arch="x86_64 aarch64 armv7"
+license="Unlicense" # TODO: https://github.com/autobrr/autobrr/issues/416
+options="net"
+makedepends="go yarn"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/autobrr/autobrr/archive/v$pkgver.tar.gz
+	autobrr.initd
+	autobrr.confd
+"
+builddir="$srcdir/$pkgname-$pkgver"
+
+prepare() {
+	default_prepare
+
+	go mod download
+	yarn --cwd "$builddir"/web install
+	mkdir -p "$builddir"/bin
+}
+
+build() {
+	local builddate=$(date -u "+%Y-%m-%dT%TZ" ${SOURCE_DATE_EPOCH:+-d @$SOURCE_DATE_EPOCH})
+	local LDFLAGS="-X main.commit=$_commit -X main.version=v$pkgver -X main.date=$builddate"
+
+	yarn --cwd "$builddir"/web build
+	go build -ldflags "$LDFLAGS" -o "$builddir"/bin "$builddir"/cmd/...
+}
+
+check() {
+	go test "$builddir"/...
+}
+
+package() {
+	install -Dm755 "$builddir"/bin/* -t "$pkgdir"/usr/bin
+
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+0d28adc49d022928642544245ee0ef0b2f58234d4335071b7adf80c88982bbc729a0b96f8aaf064c5e096adc3fc3286d3f7fdd29864f3b1a56af86e24ec6d330  autobrr-1.19.0.tar.gz
+2724ecee50229fd31fe7b0dc70e9ade8ebe2733393f0bb36083183b1032b76d1c953f3d1487b4d68d7a552b65e39fc41a864ec0759c6d65ee4bbc25914045fbb  autobrr.initd
+93e5f2b2675b1dca9b647cd1640d44e90191cf9d9e479f7522c1a3bb75d47711fa66052cf050ad89191d9f3e97f9b510a2066967169e5235d94b6de74d89e661  autobrr.confd
+"

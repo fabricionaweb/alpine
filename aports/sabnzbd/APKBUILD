@@ -70,10 +70,10 @@ package() {
 
 	install -Dm755 "$builddir"/SABnzbd.py -t "$DESTDIR"
 	cp -af "$builddir"/sabnzbd \
-				 "$builddir"/email \
-				 "$builddir"/interfaces \
-				 "$builddir"/locale \
-				 "$DESTDIR"
+		"$builddir"/email \
+		"$builddir"/interfaces \
+		"$builddir"/locale \
+		"$DESTDIR"
 
 	install -Dm644 "$builddir"/licenses/* -t "$pkgdir"/usr/share/licenses/$pkgname
 	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname

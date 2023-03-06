@@ -11,9 +11,9 @@ options="!check" # no test suite
 license="custom"
 subpackages="$pkgname-doc"
 source="
-  https://www.rarlab.com/rar/unrarsrc-$pkgver.tar.gz
+	https://www.rarlab.com/rar/unrarsrc-$pkgver.tar.gz
 	makefile.patch
-  "
+"
 builddir="$srcdir/$pkgname"
 
 build() {

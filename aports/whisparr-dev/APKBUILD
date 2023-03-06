@@ -33,10 +33,10 @@ pkggroups="whisparr"
 
 # map arch to dotnet
 case $CARCH in
-  x86_64) _dotnet_arch="x64" ;;
-  aarch64) _dotnet_arch="arm64" ;;
-  armv7) _dotnet_arch="arm" ;;
-  *) _dotnet_arch="$CARCH" ;;
+	x86_64) _dotnet_arch="x64" ;;
+	aarch64) _dotnet_arch="arm64" ;;
+	armv7) _dotnet_arch="arm" ;;
+	*) _dotnet_arch="$CARCH" ;;
 esac
 
 # custom variables
@@ -46,54 +46,54 @@ _output="$builddir/_output"
 _artifacts="$_output/$_framework/$_runtime/publish"
 
 prepare() {
-  default_prepare
+	default_prepare
 
-  # increase max opened files
-  ulimit -n 4096
+	# increase max opened files
+	ulimit -n 4096
 
-  # replace version info
-  local buildprops="$builddir"/src/Directory.Build.props
-  sed -i -e "s/<AssemblyVersion>[0-9.*]\+<\/AssemblyVersion>/<AssemblyVersion>$pkgver<\/AssemblyVersion>/g" "$buildprops"
-  sed -i -e "s/<AssemblyConfiguration>[\$()A-Za-z-]\+<\/AssemblyConfiguration>/<AssemblyConfiguration>develop<\/AssemblyConfiguration>/g" "$buildprops"
+	# replace version info
+	local buildprops="$builddir"/src/Directory.Build.props
+	sed -i -e "s/<AssemblyVersion>[0-9.*]\+<\/AssemblyVersion>/<AssemblyVersion>$pkgver<\/AssemblyVersion>/g" "$buildprops"
+	sed -i -e "s/<AssemblyConfiguration>[\$()A-Za-z-]\+<\/AssemblyConfiguration>/<AssemblyConfiguration>develop<\/AssemblyConfiguration>/g" "$buildprops"
 }
 
 build() {
-  # build the package
-  dotnet build "$builddir"/src \
-    -p:RuntimeIdentifiers="$_runtime" \
-    -p:Configuration=Release \
-    -p:SelfContained=false \
-    -t:PublishAllRids
+	# build the package
+	dotnet build "$builddir"/src \
+		-p:RuntimeIdentifiers="$_runtime" \
+		-p:Configuration=Release \
+		-p:SelfContained=false \
+		-t:PublishAllRids
 
-  # remove service helpers
-  rm -f "$_artifacts"/ServiceUninstall.*
-  rm -f "$_artifacts"/ServiceInstall.*
-  # remove Whisparr.Windows
-  rm -f "$_artifacts"/Sonarr.Windows.*
+	# remove service helpers
+	rm -f "$_artifacts"/ServiceUninstall.*
+	rm -f "$_artifacts"/ServiceInstall.*
+	# remove Whisparr.Windows
+	rm -f "$_artifacts"/Sonarr.Windows.*
 
-  # build web ui
-  export BROWSERSLIST_IGNORE_OLD_DATA=true
-  yarn --cwd "$builddir" install --frozen-lockfile --network-timeout 120000
-  yarn --cwd "$builddir" build --env production --no-stats
+	# build web ui
+	export BROWSERSLIST_IGNORE_OLD_DATA=true
+	yarn --cwd "$builddir" install --frozen-lockfile --network-timeout 120000
+	yarn --cwd "$builddir" build --env production --no-stats
 
-  # move web ui to artifacts folder
-  mv "$_output"/UI "$_artifacts"
+	# move web ui to artifacts folder
+	mv "$_output"/UI "$_artifacts"
 }
 
 package() {
-  local DESTDIR="$pkgdir"/usr/lib/whisparr
+	local DESTDIR="$pkgdir"/usr/lib/whisparr
 
-  # use package_info to disable update feature
-  install -Dm644 "$srcdir"/package_info "$DESTDIR"/package_info
-  echo "PackageVersion=$pkgver-$pkgrel" >>"$DESTDIR"/package_info
+	# use package_info to disable update feature
+	install -Dm644 "$srcdir"/package_info "$DESTDIR"/package_info
+	echo "PackageVersion=$pkgver-$pkgrel" >>"$DESTDIR"/package_info
 
-  cp -af "$_artifacts" "$DESTDIR"/bin
-  # use ffprobe from ffmpeg package
-  ln -sf /usr/bin/ffprobe "$DESTDIR"/bin
-  chown -R "$pkgusers:$pkggroups" "$DESTDIR"
+	cp -af "$_artifacts" "$DESTDIR"/bin
+	# use ffprobe from ffmpeg package
+	ln -sf /usr/bin/ffprobe "$DESTDIR"/bin
+	chown -R "$pkgusers:$pkggroups" "$DESTDIR"
 
-  install -Dm755 "$srcdir"/whisparr.initd "$pkgdir"/etc/init.d/whisparr
-  install -Dm644 "$srcdir"/whisparr.confd "$pkgdir"/etc/conf.d/whisparr
+	install -Dm755 "$srcdir"/whisparr.initd "$pkgdir"/etc/init.d/whisparr
+	install -Dm644 "$srcdir"/whisparr.confd "$pkgdir"/etc/conf.d/whisparr
 }
 
 sha512sums="

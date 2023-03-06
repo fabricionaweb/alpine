@@ -1,0 +1,5 @@
+# Tautulli configuration options
+
+command_user="tautulli:tautulli" # user:group
+directory="/var/lib/tautulli"
+supervisor="supervise-daemon"

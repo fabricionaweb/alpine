@@ -1,0 +1,40 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=tautulli
+pkgver=2.11.1
+pkgrel=0
+_commit=3c996f01a9fe15466978781022fdbb00d1e189a9 # refers to the tag
+pkgdesc="A Python based monitoring and tracking tool for Plex Media Server."
+url="https://github.com/Tautulli/Tautulli"
+arch="noarch"
+license="GPL-3.0-only"
+options="net !check" # no tests
+depends="python3"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/Tautulli/Tautulli/archive/v$pkgver.tar.gz
+	tautulli.initd
+	tautulli.confd
+"
+builddir="$srcdir/Tautulli-$pkgver"
+
+package() {
+	local DESTDIR="$pkgdir"/usr/lib/tautulli
+
+	install -Dm755 "$builddir"/Tautulli.py -t "$DESTDIR"
+	install -Dm644 "$builddir"/CHANGELOG.md -t "$DESTDIR"
+
+	echo "$_commit" >"$DESTDIR"/version.txt
+	echo "v$pkgver" >"$DESTDIR"/branch.txt
+	cp -af "$builddir"/data "$builddir"/lib "$builddir"/plexpy "$DESTDIR"
+
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+b7e477c62543169c681ada4d807d1afd985d3579e793e706c74be142810c350b7dba0b3c552902bae07019d22be9b602d65fc07afccba86d52ac87c1b5e7a072  tautulli-2.11.1.tar.gz
+395b46dddd4e47c17cf76c458f0e792d117bc192e9dad57ae6848c1d7b5c1d16274043836fb9fe59029adf63346766d543a6cc0488fd3134073de0c6a995781a  tautulli.initd
+172780b38d9f2edade406c30dbbe6c8a7dffb8d975c4cf40d86c886a0ecb6121e369a0b50d81e3bb3197aef8dde266e5a065ede46285b0dc6771218a2c9aee3c  tautulli.confd
+"

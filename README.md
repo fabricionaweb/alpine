@@ -21,3 +21,4 @@
     - `sabnzbd`
     - `autobrr`
     - `tautulli`
+    - `qbit_manage`

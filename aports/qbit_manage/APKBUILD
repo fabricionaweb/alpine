@@ -1,0 +1,34 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=qbit_manage
+pkgver=3.4.4
+pkgrel=1
+pkgdesc="This tool will help manage tedious tasks in qBittorrent and automate them."
+url="https://github.com/StuffAnThings/qbit_manage"
+arch="noarch"
+license="MIT"
+options="!check" # no tests
+depends="
+	python3
+	py3-qbittorrent-api
+	py3-retrying
+	py3-ruamel.yaml
+	py3-schedule
+	"
+source="$pkgname-$pkgver.tar.gz::https://github.com/StuffAnThings/qbit_manage/archive/v$pkgver.tar.gz"
+
+package() {
+	local DESTDIR="$pkgdir"/usr/lib/qbit_manage
+
+	install -Dm755 "$builddir"/qbit_manage.py -t "$DESTDIR"
+	install -Dm644 "$builddir"/VERSION -t "$DESTDIR"
+
+	cp -af "$builddir"/config \
+		"$builddir"/modules \
+		"$builddir"/scripts \
+		"$DESTDIR"
+}
+
+sha512sums="
+fd100f57255779838f8f98533979da95a5b9d8b8d342774781f206d1f0236f1f171796c7e5b62e38f87f2d529b381ed178ea8554284852bf7e2b7004b090f8d6  qbit_manage-3.4.4.tar.gz
+"

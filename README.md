@@ -20,3 +20,4 @@
     - `whisparr-dev`
     - `sabnzbd`
     - `autobrr`
+    - `tautulli`

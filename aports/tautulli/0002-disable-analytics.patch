@@ -1,0 +1,61 @@
+From d64f3044da849663655d25f97af381e9fe021b89 Mon Sep 17 00:00:00 2001
+From: Fabricio Silva <hi@fabricio.dev>
+Date: Tue, 7 Mar 2023 22:36:12 +0000
+Subject: [PATCH] Disable analytics
+
+---
+ plexpy/__init__.py | 21 +--------------------
+ plexpy/config.py   |  2 +-
+ 2 files changed, 2 insertions(+), 21 deletions(-)
+
+diff --git a/plexpy/__init__.py b/plexpy/__init__.py
+index d27cd396..dbaa292c 100644
+--- a/plexpy/__init__.py
++++ b/plexpy/__init__.py
+@@ -36,7 +36,6 @@ except ImportError:
+
+ from apscheduler.schedulers.background import BackgroundScheduler
+ from apscheduler.triggers.interval import IntervalTrigger
+-from UniversalAnalytics import Tracker
+ import pytz
+
+ PYTHON2 = sys.version_info[0] == 2
+@@ -2756,25 +2755,7 @@ def generate_uuid():
+
+
+ def initialize_tracker():
+-    data = {
+-        'dataSource': 'server',
+-        'appName': common.PRODUCT,
+-        'appVersion': common.RELEASE,
+-        'appId': INSTALL_TYPE,
+-        'appInstallerId': CONFIG.GIT_BRANCH,
+-        'dimension1': '{} {}'.format(common.PLATFORM, common.PLATFORM_RELEASE),  # App Platform
+-        'dimension2': common.PLATFORM_LINUX_DISTRO,  # Linux Distro
+-        'dimension3': common.PYTHON_VERSION,
+-        'userLanguage': SYS_LANGUAGE,
+-        'documentEncoding': SYS_ENCODING,
+-        'noninteractive': True
+-        }
+-
+-    tracker = Tracker.create('UA-111522699-2', client_id=CONFIG.PMS_UUID, hash_client_id=True,
+-                             user_agent=common.USER_AGENT)
+-    tracker.set(data)
+-
+-    return tracker
++    return None
+
+
+ def analytics_event(category, action, label=None, value=None, **kwargs):
+diff --git a/plexpy/config.py b/plexpy/config.py
+index 544cf79a..2170b1b9 100644
+--- a/plexpy/config.py
++++ b/plexpy/config.py
+@@ -205,7 +205,7 @@ _CONFIG_DEFINITIONS = {
+     'WEEK_START_MONDAY': (int, 'General', 0),
+     'JWT_SECRET': (str, 'Advanced', ''),
+     'JWT_UPDATE_SECRET': (bool_int, 'Advanced', 0),
+-    'SYSTEM_ANALYTICS': (int, 'Advanced', 1),
++    'SYSTEM_ANALYTICS': (int, 'Advanced', 0),
+     'SYS_TRAY_ICON': (int, 'General', 1),
+ }

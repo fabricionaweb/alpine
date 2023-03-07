@@ -1,0 +1,23 @@
+From 9a8573b4cf80757fe9543809412a4ca0c25a5c87 Mon Sep 17 00:00:00 2001
+From: Fabricio Silva <hi@fabricio.dev>
+Date: Mon, 6 Mar 2023 18:37:46 +0000
+Subject: [PATCH] Remove lib import code
+
+---
+ Tautulli.py | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/Tautulli.py b/Tautulli.py
+index eebfa55a..7c0cf6cc 100755
+--- a/Tautulli.py
++++ b/Tautulli.py
+@@ -20,9 +20,6 @@
+ import os
+ import sys
+
+-# Ensure lib added to path, before any other imports
+-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lib'))
+-
+ from future.builtins import str
+
+ import appdirs

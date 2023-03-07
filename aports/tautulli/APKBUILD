@@ -2,32 +2,99 @@
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=tautulli
 pkgver=2.11.1
-pkgrel=0
+pkgrel=3
 _commit=3c996f01a9fe15466978781022fdbb00d1e189a9 # refers to the tag
 pkgdesc="A Python based monitoring and tracking tool for Plex Media Server."
 url="https://github.com/Tautulli/Tautulli"
 arch="noarch"
 license="GPL-3.0-only"
 options="net !check" # no tests
-depends="python3"
+depends="
+	python3
+	py3-apscheduler
+	py3-arrow
+	py3-autocommand
+	py3-appdirs
+	py3-bleach
+	py3-beautifulsoup4
+	py3-cherrypy
+	py3-configobj
+	py3-distro
+	py3-dnspython
+	py3-importlib-metadata
+	py3-inflect
+	py3-jaraco.classes
+	py3-jaraco.text
+	py3-jwt
+	py3-mako
+	py3-musicbrainzngs
+	py3-packaging
+	py3-paho-mqtt
+	py3-simplejson
+	py3-tempora
+	py3-twitter
+	py3-tzdata
+	py3-xmltodict
+	py3-websocket-client
+	py3-setuptools
+	"
+makedepends="py3-pip py3-virtualenv"
 subpackages="$pkgname-openrc"
 install="$pkgname.pre-install"
 source="
 	$pkgname-$pkgver.tar.gz::https://github.com/Tautulli/Tautulli/archive/v$pkgver.tar.gz
+	0001-remove-lib-syspath.patch
+	0002-disable-analytics.patch
 	tautulli.initd
 	tautulli.confd
-"
+	"
 builddir="$srcdir/Tautulli-$pkgver"
 
+prepare() {
+	default_prepare
+
+	# patch version
+	echo "$_commit" >"$builddir"/version.txt
+	echo "v$pkgver" >"$builddir"/branch.txt
+}
+
+build() {
+	# move packages out the lib folder (we avoid sys path changes)
+	cp -af "$builddir"/lib/hashing_passwords.py \
+		"$builddir"/lib/certgen.py \
+		"$builddir"/lib/plexapi \
+		"$builddir"
+
+	python3 -m venv --clear --system-site-packages venv
+	# packages that dont exists in alpine repo or have been forked
+	venv/bin/python3 -m pip install --no-deps --target "$builddir"/site-packages \
+		cloudinary facebook-sdk gntp \
+		backports.csv httpagentparser IPy profilehooks \
+		git+https://github.com/Tautulli/ipwhois.git@master#egg=ipwhois
+	# clean
+	find "$builddir" -name "__pycache__" -type d -exec rm -rf {} +
+}
+
 package() {
+	local pyver="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
 	local DESTDIR="$pkgdir"/usr/lib/tautulli
 
-	install -Dm755 "$builddir"/Tautulli.py -t "$DESTDIR"
-	install -Dm644 "$builddir"/CHANGELOG.md -t "$DESTDIR"
+	install -Dm755 "$builddir"/Tautulli.py \
+		"$builddir"/hashing_passwords.py \
+		"$builddir"/certgen.py \
+		-t "$DESTDIR"
+	install -Dm644 "$builddir"/CHANGELOG.md \
+		"$builddir"/version.txt \
+		"$builddir"/branch.txt \
+		-t "$DESTDIR"
+	cp -af "$builddir"/data \
+		"$builddir"/plexpy \
+		"$builddir"/plexapi \
+		"$DESTDIR"
 
-	echo "$_commit" >"$DESTDIR"/version.txt
-	echo "v$pkgver" >"$DESTDIR"/branch.txt
-	cp -af "$builddir"/data "$builddir"/lib "$builddir"/plexpy "$DESTDIR"
+	# packages we installed with pip
+	install -dm755 "$pkgdir"/usr/lib/python$pyver/site-packages
+	cp -af "$builddir"/site-packages/* "$pkgdir"/usr/lib/python$pyver/site-packages
 
 	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
 	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
@@ -35,6 +102,8 @@ package() {
 
 sha512sums="
 b7e477c62543169c681ada4d807d1afd985d3579e793e706c74be142810c350b7dba0b3c552902bae07019d22be9b602d65fc07afccba86d52ac87c1b5e7a072  tautulli-2.11.1.tar.gz
+2d33a636cd3276a3f00bd4f3abf0ac720394bf2fe80155f06266163843f1b65942af9ff9dbc16fac8078b5b98f17441dcd861bc2a75da8ddf513e274a98e0e0b  0001-remove-lib-syspath.patch
+c0a8d2f8b82b17d015884c2caa473c967c2e0034f86ee19f0b75ad742f168929d652e2aed5174e9780a83c245af206b3824aae30051fad1221ac0b7f1775e6c5  0002-disable-analytics.patch
 395b46dddd4e47c17cf76c458f0e792d117bc192e9dad57ae6848c1d7b5c1d16274043836fb9fe59029adf63346766d543a6cc0488fd3134073de0c6a995781a  tautulli.initd
 172780b38d9f2edade406c30dbbe6c8a7dffb8d975c4cf40d86c886a0ecb6121e369a0b50d81e3bb3197aef8dde266e5a065ede46285b0dc6771218a2c9aee3c  tautulli.confd
 "

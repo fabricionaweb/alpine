@@ -2,8 +2,8 @@
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 
 pkgname=sonarr-dev
-pkgver=4.0.0.394
-_commit=aa938d911b61b08185dc57a0887f3f33e3c6e1f2
+pkgver=4.0.0.396
+_commit=9800bd6b439257e73e3545e125cd03900a3036bb
 pkgrel=0
 pkgdesc="TV download automation for usenet and torrents."
 url="https://github.com/Sonarr/Sonarr"
@@ -97,7 +97,7 @@ package() {
 }
 
 sha512sums="
-05b4de99fb2b273b513a4bf784ec55e31a0fe47d95574dc59ada4e2e6d9d6f8a90de7ffe1b0bbb28afc3db83a71fc3b9f7f9b954a48e2d4c8394d7649dd4de98  sonarr-dev-4.0.0.394.tar.gz
+abf955b479ce08630f84d72fabcf5c9178782c316fc92c330853b908d23d488c1c14735e070d740a0f735d338ab4c1d01619ce3b3ef2dccdeb22cbafbbbc00cf  sonarr-dev-4.0.0.396.tar.gz
 1a4800fae4bcfad2ca12b03cc133bee29a161e1bc9d7bf789f519d69aa4dfeff1ee9830cc4836f9fd5525062472c76ad341e9ac366af42d2e6149ede3c9e7dc8  sonarr.initd
 2b6e9089bc3460b4df207d9b44895251a53aaf884e6f475ba79bf04ae6a2c992743b3dca32000e998d4ca77f444b0055dfcfe82422123a98232c879a9115b081  sonarr.confd
 7af490784f86afc563e7d4fcfa1daed84c08310c85d148afbd98befdd7174304a6e2b7c549ddaf7224be1713aef0f9435e6ed5c8ba353ac335131326632d6b55  package_info

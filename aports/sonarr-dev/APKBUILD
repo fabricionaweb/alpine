@@ -2,8 +2,8 @@
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 
 pkgname=sonarr-dev
-pkgver=4.0.0.396
-_commit=9800bd6b439257e73e3545e125cd03900a3036bb
+pkgver=4.0.0.397
+_commit=4f5a183152b0c24176d8f335515936270f304061
 pkgrel=1
 pkgdesc="TV download automation for usenet and torrents."
 url="https://github.com/Sonarr/Sonarr"
@@ -23,7 +23,7 @@ subpackages="$pkgname-openrc"
 install="$pkgname.pre-install"
 source="
 	$pkgname-$pkgver.tar.gz::https://github.com/Sonarr/Sonarr/archive/$_commit.tar.gz
-	0001-disable-restart.patch
+  0001-disable-restart.patch
 	sonarr.initd
 	sonarr.confd
 	package_info
@@ -98,7 +98,7 @@ package() {
 }
 
 sha512sums="
-abf955b479ce08630f84d72fabcf5c9178782c316fc92c330853b908d23d488c1c14735e070d740a0f735d338ab4c1d01619ce3b3ef2dccdeb22cbafbbbc00cf  sonarr-dev-4.0.0.396.tar.gz
+d7b5cb02fecf442ea9caa7cc6dfa89f72889411d44d0e3d648e906bdeb5dbd99a69f82a08d8ee34578a1aa1f62b135e6e57031f32be1d52a0018ae5654b61f36  sonarr-dev-4.0.0.397.tar.gz
 6b3f333b9b25630644c2c7aebdb41562e603fe0a761b8fa26e07da6bfa81da8d3ffe86b28c5ab8af92e04da3bf02296f8b02a9c6e573df2b126c0fef69ba6a3e  0001-disable-restart.patch
 1a4800fae4bcfad2ca12b03cc133bee29a161e1bc9d7bf789f519d69aa4dfeff1ee9830cc4836f9fd5525062472c76ad341e9ac366af42d2e6149ede3c9e7dc8  sonarr.initd
 13cccd0e567f9b92cbfda0cd9381bdf68b7d330ed3b576d0cccf296115293d7113c06b05a12e2951867fdfe9e26aa8a41093ee5bbf807c83020837d041ca615a  sonarr.confd

@@ -1,0 +1,76 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=bazarr
+pkgver=1.2.0
+pkgrel=0
+pkgdesc="Manage and download subtitles for your media."
+url="https://github.com/morpheus65535/bazarr"
+arch="all"
+license="GPL-3.0-only"
+options="net !check" # no tests
+# It doesnt worth to trace deps for this one as it modify many dependencies
+depends="
+	ffmpeg
+	mediainfo
+	unrar
+	py3-lxml
+	py3-numpy
+	py3-psycopg2
+	py3-setuptools
+	"
+makedepends="
+	npm
+	py3-pip
+	py3-virtualenv
+	"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/morpheus65535/bazarr/archive/v$pkgver.tar.gz
+	bazarr.initd
+	bazarr.confd
+"
+
+prepare() {
+	default_prepare
+
+	# patch version
+	echo "v$pkgver" >"$builddir"/VERSION
+}
+
+build() {
+	python3 -m venv --clear --system-site-packages venv
+	# packages that dont exists in alpine repo or have been forked
+	venv/bin/python3 -m pip install --target "$builddir"/site-packages webrtcvad-wheels
+	# clean
+	find "$builddir" -name "__pycache__" -type d -exec rm -rf {} +
+
+	# build frontend
+	npm --prefix "$builddir"/frontend ci
+	npm --prefix "$builddir"/frontend run build
+}
+
+package() {
+	local pyver="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+	local DESTDIR="$pkgdir"/usr/lib/bazarr
+
+	install -Dm755 "$builddir"/bazarr.py -t "$DESTDIR"
+	install -Dm644 "$builddir"/VERSION -t "$DESTDIR"
+
+	cp -af "$builddir"/bazarr "$builddir"/libs "$DESTDIR"
+	install -dm755 "$DESTDIR"/frontend
+	cp -af "$builddir"/frontend/build "$DESTDIR"/frontend
+
+	# packages we installed with pip
+	install -dm755 "$pkgdir"/usr/lib/python$pyver/site-packages
+	cp -af "$builddir"/site-packages/* "$pkgdir"/usr/lib/python$pyver/site-packages
+
+	install -Dm755 "$srcdir"/bazarr.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/bazarr.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+d55db0b7de090543de1ab45c0416db9f31a1e409181deb9d03d30d4975a66a00a4b542c49d9488b2b37949040448798781df80ad78d64e50aaafa87200fc00f3  bazarr-1.2.0.tar.gz
+6df69abd039c2c128e27b1249f5dd97b4dfd5ac1284caf056deb74299c0e33d6eeca71de92801f123c5b0cbf1793ef1d3954d840c16c9f124dfc439a39f39cb2  bazarr.initd
+e30df50afe8d5b16dcfb72038c306fb7fc0384bb85030253cbfd696ee229b383ba1f991203bc59ee0d63190f3f68e1482489c5826b575975e106b94ebb2b8e99  bazarr.confd
+"

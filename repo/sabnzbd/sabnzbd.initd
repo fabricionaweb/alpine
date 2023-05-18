@@ -1,0 +1,27 @@
+#!/sbin/openrc-run
+
+# fallback values for /etc/conf.d/sabnzbd
+: ${command_user:=sabnzbd:sabnzbd}
+: ${directory:=/var/lib/sabnzbd}
+: ${logdir:=/var/log/sabnzbd}
+: ${umask:=0002}
+
+name=sabnzbd
+description="SABnzbd daemon"
+command="/usr/bin/python3 /usr/lib/sabnzbd/SABnzbd.py"
+command_args="--config-file $directory/sabnzbd.ini $command_args"
+command_background=true
+
+pidfile="/run/$name.pid"
+output_log="$logdir/output.log"
+error_log="$logdir/error.log"
+
+depend() {
+	need net
+	use dns logger
+}
+
+start_pre() {
+	checkpath -d -o "$command_user" "$directory" "$logdir"
+	checkpath -f -o "$command_user" "$output_log" "$error_log"
+}

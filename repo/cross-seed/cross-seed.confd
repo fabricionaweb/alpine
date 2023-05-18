@@ -1,0 +1,7 @@
+# cross-seed configuration options
+
+command_user="xseed:xseed" # user:group
+directory="/var/lib/cross-seed"
+logdir="/var/log/cross-seed"
+supervisor="supervise-daemon"
+supervise_daemon_args="--env CONFIG_DIR=$directory"

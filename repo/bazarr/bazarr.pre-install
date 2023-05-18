@@ -1,0 +1,6 @@
+#!/bin/sh
+
+addgroup -S bazarr 2>/dev/null
+adduser -S -D -h /var/lib/bazarr -s /sbin/nologin -G bazarr -g bazarr bazarr 2>/dev/null
+
+exit 0

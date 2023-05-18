@@ -1,0 +1,27 @@
+#!/sbin/openrc-run
+
+# fallback values for /etc/conf.d/bazarr
+: ${command_user:=bazarr:bazarr}
+: ${directory:=/var/lib/bazarr}
+: ${logdir:=/var/log/bazarr}
+: ${umask:=0002}
+
+name=bazarr
+description="Bazarr daemon"
+command="/usr/bin/python3 /usr/lib/bazarr/bazarr.py"
+command_args="--config $directory"
+command_background=true
+
+pidfile="/run/$name.pid"
+output_log="$logdir/output.log"
+error_log="$logdir/error.log"
+
+depend() {
+	need net
+	use dns logger netmount
+}
+
+start_pre() {
+	checkpath -d -o "$command_user" "$directory" "$logdir"
+	checkpath -f -o "$command_user" "$output_log" "$error_log"
+}

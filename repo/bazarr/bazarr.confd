@@ -1,0 +1,7 @@
+# Bazarr configuration options
+
+command_user="bazarr:bazarr" # user:group
+directory="/var/lib/bazarr"
+logdir="/var/log/bazarr"
+umask=0002
+supervisor="supervise-daemon"

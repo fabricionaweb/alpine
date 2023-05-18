@@ -1,0 +1,10 @@
+# Overseerr configuration options
+
+command_user="overseerr:overseerr" # user:group
+directory="/var/lib/overseerr"
+logdir="/var/log/overseerr"
+supervisor="supervise-daemon"
+supervise_daemon_args="
+	--env CONFIG_DIRECTORY=$directory
+	--env PORT=5055
+"

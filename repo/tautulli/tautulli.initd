@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+
+# fallback values for /etc/conf.d/tautulli
+: ${command_user:=tautulli:tautulli}
+: ${directory:=/var/lib/tautulli}
+: ${logdir:=/var/log/tautulli}
+
+name=tautulli
+description="Tautulli daemon"
+command="/usr/bin/python3 /usr/lib/tautulli/Tautulli.py"
+command_args="--nofork --nolaunch --datadir $directory"
+command_background=true
+
+pidfile="/run/$name.pid"
+output_log="$logdir/output.log"
+error_log="$logdir/error.log"
+
+depend() {
+	need net
+	use dns logger
+}
+
+start_pre() {
+	checkpath -d -o "$command_user" "$directory" "$logdir"
+	checkpath -f -o "$command_user" "$output_log" "$error_log"
+}

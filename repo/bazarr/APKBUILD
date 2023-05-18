@@ -1,0 +1,78 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=bazarr
+pkgver=1.2.1
+pkgrel=0
+pkgdesc="Manage and download subtitles for your media."
+url="https://github.com/morpheus65535/bazarr"
+arch="all"
+license="GPL-3.0-only"
+options="net !check" # no tests
+# It doesnt worth to trace deps for this one as it modify many dependencies
+depends="
+	ffmpeg
+	mediainfo
+	unrar
+
+	py3-lxml
+	py3-numpy
+	py3-pillow
+	py3-psycopg2
+	py3-setuptools
+	"
+makedepends="
+	npm
+	py3-pip
+	py3-virtualenv
+	"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/morpheus65535/bazarr/archive/v$pkgver.tar.gz
+	bazarr.initd
+	bazarr.confd
+	"
+
+prepare() {
+	default_prepare
+
+	# patch version
+	echo "v$pkgver" >VERSION
+}
+
+build() {
+	python3 -m venv --clear --system-site-packages venv
+	# packages that dont exists in alpine repo or have been forked
+	venv/bin/python3 -m pip install --target site-packages webrtcvad-wheels
+	# clean
+	find . -name "__pycache__" -type d -exec rm -rf {} +
+
+	# build frontend
+	npm --prefix frontend ci
+	npm --prefix frontend run build
+}
+
+package() {
+	local pyver="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+	local DESTDIR="$pkgdir"/usr/lib/bazarr
+
+	install -Dm755 bazarr.py -t "$DESTDIR"
+	install -Dm644 VERSION -t "$DESTDIR"
+
+	cp -af bazarr libs "$DESTDIR"
+	install -dm755 "$DESTDIR"/frontend
+	cp -af frontend/build "$DESTDIR"/frontend
+
+	# packages we installed with pip
+	install -dm755 "$pkgdir"/usr/lib/python$pyver/site-packages
+	cp -af site-packages/* "$pkgdir"/usr/lib/python$pyver/site-packages
+
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+14c08fc5cb8cf6cab971637224b3b2373983568861158329b216f3f1925c694a180b699e12cc02852ed538f8b292bab9f74e60105cd972d85a07107a71ac2359  bazarr-1.2.1.tar.gz
+f11d083a60715f78442fc99a7bbf05e14e0bed02315bc4c6d667bd99209a1b1d53a8a14cd8e1db00e3be5d0dac87f2887f59c8be77941e30bceb559bc595c182  bazarr.initd
+7ac090e0d691d9e5c60bf8e8da28db7683c178edf02588bc130fa41778dd3ef957f85abf30b94ef4bb9f75b7b7a7cac4561ca77ac90b63490867537e3dea7201  bazarr.confd
+"

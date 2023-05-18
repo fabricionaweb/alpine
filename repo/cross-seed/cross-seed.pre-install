@@ -1,0 +1,6 @@
+#!/bin/sh
+
+addgroup -S xseed 2>/dev/null
+adduser -S -D -h /var/lib/cross-seed -s /sbin/nologin -G xseed -g xseed xseed 2>/dev/null
+
+exit 0

@@ -1,0 +1,67 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=cross-seed
+pkgver=5.0.3
+pkgrel=1
+pkgdesc="Fully-automatic cross-seeding with Torznab"
+url="https://github.com/cross-seed/cross-seed"
+arch="all"
+license="Apache-2.0"
+options="net !check" # no tests
+depends="nodejs"
+makedepends="npm python3"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/cross-seed/cross-seed/archive/v$pkgver.tar.gz
+	0001-increase-timeout.patch
+	0002-remove-root-path.patch
+	cross-seed.initd
+	cross-seed.confd
+	"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+
+export HUSKY=0
+
+prepare() {
+	default_prepare
+
+	npm ci
+}
+
+build() {
+	npm run build
+	npm prune --omit=dev
+
+	# remove other unnecessary files
+	find . -type d -iname '.github' -prune -exec rm -rf {} +;
+	find . -type f \( \
+			-iname '*.cmd' -o -iname '*.bat' -o \
+			-iname '*.map' -o -iname '*.md' -o \
+			-iname '*.ts' -o -iname '*.git*' -o \
+			-iname 'Makefile' -o -iname 'AUTHORS*' -o \
+			-iname 'LICENSE*' -o -iname 'CONTRIBUTING*' -o \
+			-iname 'CHANGELOG*' -o -iname 'README*' \
+		\) -delete
+}
+
+package() {
+	local destdir="$pkgdir"/usr/share/node_modules/cross-seed
+
+	install -Dm644 package.json -t $destdir
+	cp -af dist node_modules "$destdir"
+	install -m755 dist/cmd.js $destdir/dist
+
+	install -dm755 "$pkgdir"/usr/bin
+	ln -sf ../share/node_modules/cross-seed/dist/cmd.js "$pkgdir"/usr/bin/cross-seed
+
+	install -Dm755 "$srcdir"/cross-seed.initd "$pkgdir"/etc/init.d/cross-seed
+	install -Dm644 "$srcdir"/cross-seed.confd "$pkgdir"/etc/conf.d/cross-seed
+}
+
+sha512sums="
+90a33cc7d0d2c4278e22e01e871778332627f59f280c6d784509288d79ffd968b3336ff55a98433f9fc66d51d797c902926978c0a5c156573cb147f2aba852f6  cross-seed-5.0.3.tar.gz
+e2703737df719b84574532bb259299c0d302d33dca7bfcd4bc6cdaf480b976de7d16ac0d80622eda3a074aeb83ed183136c0519ac08d36737c69732da9ff320e  0001-increase-timeout.patch
+56aa78cd6f4828f739d24809739ac061ea37fee8452124007075dbe7c982472cb9b3512d046a476a8aef1e7ac203bdb54b3b8c32d3def4ef76fb6ee970c18356  0002-remove-root-path.patch
+89896849a0d703b76ee6ba05a8db212aac9c5efeb625c3ee6fc552d3dbb85cbb7e906458ab3e86edb46f855afa62314d56e92725a3721f93397bc9e1c4f10d71  cross-seed.initd
+91089033b1b9e768d78471b850af11260d6dcff098880f27b2fe01f33b1deab36afea05e77ab8e76553d5f1dea8d90d53358ae27b5d6bd54f0e7dcf05a4ee8a8  cross-seed.confd
+"

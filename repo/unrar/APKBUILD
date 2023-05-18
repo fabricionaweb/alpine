@@ -1,0 +1,33 @@
+# Contributor: Sören Tempel <soeren+alpine@soeren-tempel.net>
+# Contributor: Carlo Landmeter <clandmeter@alpinelinux.org>
+# Contributor: Natanael Copa <ncopa@alpinelinux.org>
+pkgname=unrar
+pkgver=6.2.6
+pkgrel=0
+pkgdesc="RAR uncompression program"
+url="https://www.rarlab.com/rar_add.htm"
+arch="all"
+options="!check" # no test suite
+license="custom"
+subpackages="$pkgname-doc"
+source="
+	https://www.rarlab.com/rar/unrarsrc-$pkgver.tar.gz
+	makefile.patch
+"
+builddir="$srcdir/$pkgname"
+
+build() {
+	make CXX="${CXX:-g++}" STRIP=: -f makefile
+}
+
+package() {
+	make DESTDIR="$pkgdir"/usr install
+
+	install -Dm644 license.txt \
+		"$pkgdir"/usr/share/licenses/$pkgname/license.txt
+}
+
+sha512sums="
+c2dc4176426dd73cfcbb3af135f8eb44ad455ea29e0e45b23e6987dd33658530444e35598fd5ffae0e27a466a9e01daf4b167edd69a686b62fd3b5a0f3bf81f6  unrarsrc-6.2.6.tar.gz
+454d5b9b93ee44c8004e6914db058ec81a3688a987b55348fa6c231e37ca630a3e2842528700aa7d75195cde0771adfec25b566c05ae5dd479021f4fb4b7bd78  makefile.patch
+"

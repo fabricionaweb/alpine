@@ -1,0 +1,8 @@
+# SABnzbd configuration options
+
+command_user="sabnzbd:sabnzbd" # user:group
+command_args="--server 0.0.0.0"
+directory="/var/lib/sabnzbd"
+logdir="/var/log/sabnzbd"
+umask=0002
+supervisor="supervise-daemon"

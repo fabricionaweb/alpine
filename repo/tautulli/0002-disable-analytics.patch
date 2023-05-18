@@ -1,0 +1,63 @@
+From 4ae161fcba04935a0dc6dedc22ddd244bb2c2eea Mon Sep 17 00:00:00 2001
+From: Fabricio Silva <hi@fabricio.dev>
+Date: Sun, 16 Apr 2023 10:42:31 +0100
+Subject: [PATCH] Disable analytics
+
+---
+ plexpy/__init__.py | 16 ++++++++--------
+ plexpy/config.py   |  2 +-
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/plexpy/__init__.py b/plexpy/__init__.py
+index 2a769374..d417dc56 100644
+--- a/plexpy/__init__.py
++++ b/plexpy/__init__.py
+@@ -36,7 +36,7 @@ except ImportError:
+
+ from apscheduler.schedulers.background import BackgroundScheduler
+ from apscheduler.triggers.interval import IntervalTrigger
+-from ga4mp import GtagMP
++# from ga4mp import GtagMP
+ import pytz
+
+ PYTHON2 = sys.version_info[0] == 2
+@@ -572,7 +572,7 @@ def start():
+         # Cancel processing exports
+         exporter.cancel_exports()
+
+-        if CONFIG.SYSTEM_ANALYTICS:
++        if False: # CONFIG.SYSTEM_ANALYTICS:
+             global TRACKER
+             TRACKER = initialize_tracker()
+
+@@ -2843,12 +2843,12 @@ def generate_uuid():
+
+
+ def initialize_tracker():
+-    tracker = GtagMP(
+-        api_secret='Cl_LjAKUT26AS22YZwqaPw',
+-        measurement_id='G-NH1M4BYM2P',
+-        client_id=CONFIG.PMS_UUID
+-    )
+-    return tracker
++    # tracker = GtagMP(
++    #     api_secret='Cl_LjAKUT26AS22YZwqaPw',
++    #     measurement_id='G-NH1M4BYM2P',
++    #     client_id=CONFIG.PMS_UUID
++    # )
++    return None # tracker
+
+
+ def analytics_event(name, **kwargs):
+diff --git a/plexpy/config.py b/plexpy/config.py
+index 7b583d8d..2db9837a 100644
+--- a/plexpy/config.py
++++ b/plexpy/config.py
+@@ -207,7 +207,7 @@ _CONFIG_DEFINITIONS = {
+     'WEEK_START_MONDAY': (int, 'General', 0),
+     'JWT_SECRET': (str, 'Advanced', ''),
+     'JWT_UPDATE_SECRET': (bool_int, 'Advanced', 0),
+-    'SYSTEM_ANALYTICS': (int, 'Advanced', 1),
++    'SYSTEM_ANALYTICS': (int, 'Advanced', 0),
+     'SYS_TRAY_ICON': (int, 'General', 1),
+ }

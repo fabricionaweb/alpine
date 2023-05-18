@@ -1,0 +1,38 @@
+From c1312c666559423d560b4220243416fb1ced6e7c Mon Sep 17 00:00:00 2001
+From: Fabricio Silva <hi@fabricio.dev>
+Date: Tue, 16 May 2023 10:24:45 +0100
+Subject: [PATCH] increase timeout
+
+Prowlarr is taking longer than 30s to answer
+
+---
+ src/torrent.ts | 2 +-
+ src/torznab.ts | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/torrent.ts b/src/torrent.ts
+index 89b9fa7..5ac62fb 100644
+--- a/src/torrent.ts
++++ b/src/torrent.ts
+@@ -37,7 +37,7 @@ export async function parseTorrentFromURL(
+ 	url: string
+ ): Promise<Result<Metafile, SnatchError>> {
+ 	const abortController = new AbortController();
+-	setTimeout(() => void abortController.abort(), 30000).unref();
++	setTimeout(() => void abortController.abort(), 130000).unref();
+
+ 	let response: Response;
+ 	try {
+diff --git a/src/torznab.ts b/src/torznab.ts
+index b849e95..fa71c0b 100644
+--- a/src/torznab.ts
++++ b/src/torznab.ts
+@@ -415,7 +415,7 @@ async function makeRequests(
+ 		for (const abortController of abortControllers) {
+ 			abortController.abort();
+ 		}
+-	}, 30000).unref();
++	}, 130000).unref();
+
+ 	const outcomes = await Promise.allSettled<Candidate[]>(
+ 		searchUrls.map((url, i) =>

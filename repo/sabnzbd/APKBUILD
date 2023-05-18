@@ -1,0 +1,87 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=sabnzbd
+pkgver=4.0.1
+pkgrel=0
+pkgdesc="SABnzbd is a program to download binary files from Usenet servers."
+url="https://sabnzbd.org/"
+arch="noarch"
+license="GPL-2.0-or-later"
+options="net !check" # par2cmdline is a dependency so tests failing, removed to test par2cmdline-turbo fork
+depends="
+	python3
+	7zip
+	unrar
+
+	py3-sabctools
+	py3-cryptography
+	py3-cheetah
+	py3-cherrypy
+	py3-feedparser
+	py3-configobj
+	py3-chardet
+	py3-pysocks
+	py3-puremagic
+	py3-guessit
+	py3-orjson
+	py3-setuptools
+	"
+checkdepends="
+	py3-virtualenv
+	py3-pip
+	py3-pytest
+	py3-pytest-httpbin
+	py3-pytest-httpserver
+	py3-requests
+	py3-pkginfo
+	py3-pyfakefs
+	py3-flaky
+	py3-xmltodict
+	py3-importlib-metadata
+	py3-lxml
+	"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/sabnzbd/sabnzbd/archive/$pkgver.tar.gz
+	sabnzbd.initd
+	sabnzbd.confd
+	"
+
+prepare() {
+	default_prepare
+
+	# translations
+	python3 "$builddir"/tools/make_mo.py
+}
+
+check() {
+	python3 -m venv --clear --system-site-packages testenv
+
+	# packages missing in alpine repository
+	testenv/bin/python3 -m pip install -U tavern tavalidate selenium
+
+	# skip the integration tests
+	testenv/bin/python3 -m pytest -k 'not test_functional'
+}
+
+package() {
+	local DESTDIR="$pkgdir"/usr/lib/sabnzbd
+
+	install -Dm755 "$builddir"/SABnzbd.py -t "$DESTDIR"
+	cp -af "$builddir"/sabnzbd \
+		"$builddir"/email \
+		"$builddir"/interfaces \
+		"$builddir"/locale \
+		"$DESTDIR"
+
+	install -Dm644 "$builddir"/licenses/* -t "$pkgdir"/usr/share/licenses/$pkgname
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/$pkgname
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+43dae4694ebd9a1ae978fb358f6c357350ac9e98d6766cd693589f66447cd17d55235fa4382e29fc8089b49fbd5214efeddfe380dca92da3e5f89c013c93cda2  sabnzbd-4.0.1.tar.gz
+a6bfab8d16318f6f3cabe15ffef6fb022d3270799d080c57d97536d80bfb33f8b7d3df27c31f288a8ab973a669c29dcd3ca4ef76bf5d8c02c3820b2e1a5fad93  sabnzbd.initd
+b0b9e5d01d0984d24a006f70e10a711eadbfb6927cd662343fe7faaac6106618d83e21ffc63d126a55efda188c251356c529e043917d1971bf10334c611e6822  sabnzbd.confd
+"

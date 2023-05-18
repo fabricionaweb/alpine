@@ -1,0 +1,87 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=overseerr
+pkgver=1.32.5
+pkgrel=1
+pkgdesc="This tool will help manage tedious tasks in qBittorrent and automate them."
+url="https://overseerr.dev"
+arch="all"
+license="MIT"
+options="net !check" # e2e tests depends on a live instance
+depends="nodejs"
+makedepends="yarn"
+source="
+	$pkgname-$pkgver.tar.gz::https://github.com/sct/overseerr/archive/v$pkgver.tar.gz
+	0001-ace-builds-min.patch
+	0002-ace-workers.patch
+	start.js
+	overseerr.confd
+	overseerr.initd
+	"
+subpackages="$pkgname-openrc"
+install="$pkgname.pre-install"
+
+export NEXT_TELEMETRY_DISABLED=1
+export CYPRESS_INSTALL_BINARY=0
+export HUSKY=0
+
+prepare() {
+	default_prepare
+
+	yarn install --frozen-lockfile --network-timeout 120000
+}
+
+build() {
+	yarn build
+
+	# remove dev dependencies (yarn prune)
+	yarn install --production --ignore-scripts
+	rm -rf .next/cache node_modules/@next/swc-*
+
+	# remove other unnecessary files
+	find node_modules/ace-builds -type d \
+		-iname 'src*' ! -iname 'src-min-noconflict' \
+		-exec rm -rf {} +;
+	find node_modules/ace-builds -type f \( \
+			\( -iname 'mode-*' ! -iname 'mode-json*' \) -o \
+			\( -iname 'worker-*' ! -iname 'worker-base*' ! -iname 'worker-json*' \) -o \
+			\( -iname 'theme-*' ! -iname 'theme-dracula*' \) \
+		\) -delete;
+	find node_modules/ace-builds/**/snippets -type f \
+		-iname '*' ! -iname 'json*' -delete;
+	find node_modules/ace-builds/**/theme -type f \
+		-iname '*' ! -iname 'dracula*' -delete;
+	find . -iname 'node-gyp*' -exec rm -rf {} +;
+	find . -type d -iname '.github' -exec rm -rf {} +;
+	find . -type f \( \
+			-iname '*.cmd' -o -iname '*.bat' -o \
+			-iname '*.map' -o -iname '*.md' -o \
+			-iname '*.ts' -o -iname '*.git*' -o \
+			-iname 'Makefile' -o -iname 'AUTHORS*' -o \
+			-iname 'LICENSE*' -o -iname 'CONTRIBUTING*' -o \
+			-iname 'CHANGELOG*' -o -iname 'README*' \
+		\) -delete;
+}
+
+package() {
+	local destdir="$pkgdir"/usr/share/node_modules/overseerr
+
+	install -Dm644 package.json overseerr-api.yml -t $destdir
+	install -m755 "$srcdir"/start.js $destdir
+	cp -af dist .next public node_modules $destdir
+
+	install -dm755 "$pkgdir"/usr/bin
+	ln -sf ../share/node_modules/overseerr/start.js "$pkgdir"/usr/bin/overseerr
+
+	install -Dm755 "$srcdir"/overseerr.initd "$pkgdir"/etc/init.d/overseerr
+	install -Dm644 "$srcdir"/overseerr.confd "$pkgdir"/etc/conf.d/overseerr
+}
+
+sha512sums="
+2796be878ffda91744a2ae0a7858fb167232518c8dc8d1edd19efcdff28a5e41b798d5fa689bfc39845ff36505a4a0394723ec6572d9415bb936535503406f3d  overseerr-1.32.5.tar.gz
+e7a07893b537517a99fe2557db2cdc39732f066991289f2a89aa25740dfceeaa7697f7bdbaf603a61b3d0bce274ecc4de2a23975f9b19cece9e74d1db8ad8f2c  0001-ace-builds-min.patch
+792157e97bbc20494cd732a8a1871491bd05580c63b130c635509b56d4e191821d3663e27fef830c7fe67ba39140d8a8d0f2a727624452fc83dc8320b60d8151  0002-ace-workers.patch
+92de5e26aa4c30d8c4295d5eb26d9d19d2fb8624d583e1230ddfc73f923262b5c207773501a8737bdc5472abfe9cea9105e92f29e4b4350be660cbd967a69088  start.js
+7eb593cfb23e6da997d7d85e8320056b019eea414ae14c6bc9a3534d88d8584087e12d9e9080e5a160126cf8e8082d1e453fd677c0179ed267ac352fa3ee6d71  overseerr.confd
+f716925be21ea37c95c0ca6614da33fdcaacb4d5f3d00430dc1b095b6c8f317018e81639f5834e3dfb4e4ff17dde6c31f1711ea7675b6a813f99dbcf24e59c26  overseerr.initd
+"

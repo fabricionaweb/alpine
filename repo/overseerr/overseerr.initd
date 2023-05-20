@@ -7,7 +7,7 @@
 
 name=overseerr
 description="Overseerr daemon"
-command="/usr/bin/overseerr"
+command="/usr/bin/node /usr/lib/overseerr/start.js"
 command_background=true
 
 pidfile="/run/$name.pid"

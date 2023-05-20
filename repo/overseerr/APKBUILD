@@ -2,7 +2,7 @@
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=overseerr
 pkgver=1.32.5
-pkgrel=1
+pkgrel=2
 pkgdesc="This tool will help manage tedious tasks in qBittorrent and automate them."
 url="https://overseerr.dev"
 arch="all"
@@ -35,7 +35,7 @@ build() {
 	yarn build
 
 	# remove dev dependencies (yarn prune)
-	yarn install --production --ignore-scripts
+	yarn install --production --ignore-scripts --prefer-offline
 	rm -rf .next/cache node_modules/@next/swc-*
 
 	# remove other unnecessary files
@@ -64,14 +64,11 @@ build() {
 }
 
 package() {
-	local destdir="$pkgdir"/usr/share/node_modules/overseerr
+	local DESTDIR="$pkgdir"/usr/lib/overseerr
 
-	install -Dm644 package.json overseerr-api.yml -t $destdir
-	install -m755 "$srcdir"/start.js $destdir
-	cp -af dist .next public node_modules $destdir
-
-	install -dm755 "$pkgdir"/usr/bin
-	ln -sf ../share/node_modules/overseerr/start.js "$pkgdir"/usr/bin/overseerr
+	install -Dm644 package.json overseerr-api.yml -t $DESTDIR
+	install -m755 "$srcdir"/start.js $DESTDIR
+	cp -af dist .next public node_modules $DESTDIR
 
 	install -Dm755 "$srcdir"/overseerr.initd "$pkgdir"/etc/init.d/overseerr
 	install -Dm644 "$srcdir"/overseerr.confd "$pkgdir"/etc/conf.d/overseerr
@@ -83,5 +80,5 @@ e7a07893b537517a99fe2557db2cdc39732f066991289f2a89aa25740dfceeaa7697f7bdbaf603a6
 792157e97bbc20494cd732a8a1871491bd05580c63b130c635509b56d4e191821d3663e27fef830c7fe67ba39140d8a8d0f2a727624452fc83dc8320b60d8151  0002-ace-workers.patch
 92de5e26aa4c30d8c4295d5eb26d9d19d2fb8624d583e1230ddfc73f923262b5c207773501a8737bdc5472abfe9cea9105e92f29e4b4350be660cbd967a69088  start.js
 7eb593cfb23e6da997d7d85e8320056b019eea414ae14c6bc9a3534d88d8584087e12d9e9080e5a160126cf8e8082d1e453fd677c0179ed267ac352fa3ee6d71  overseerr.confd
-f716925be21ea37c95c0ca6614da33fdcaacb4d5f3d00430dc1b095b6c8f317018e81639f5834e3dfb4e4ff17dde6c31f1711ea7675b6a813f99dbcf24e59c26  overseerr.initd
+68f2d3d6816bf028da48314f3e017a92894fdd91fa73d60bd5400e42eec62c7595bb80ba9a43acbd76c465f075189e57c504fbbb900cd47518129a4398676898  overseerr.initd
 "

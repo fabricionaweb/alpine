@@ -1,7 +1,7 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=qbit_manage
-pkgver=3.6.2_git20230520
+pkgver=3.6.3
 pkgrel=0
 pkgdesc="This tool will help manage tedious tasks in qBittorrent and automate them."
 url="https://github.com/StuffAnThings/qbit_manage"
@@ -15,8 +15,7 @@ depends="
 	py3-ruamel.yaml
 	py3-schedule
 	"
-source="$pkgname-$pkgver.tar.gz::https://github.com/StuffAnThings/qbit_manage/archive/develop.tar.gz"
-builddir="$srcdir/$pkgname-develop"
+source="$pkgname-$pkgver.tar.gz::https://github.com/StuffAnThings/qbit_manage/archive/v$pkgver.tar.gz"
 
 package() {
 	local DESTDIR="$pkgdir"/usr/lib/qbit_manage
@@ -28,5 +27,5 @@ package() {
 }
 
 sha512sums="
-903045da1d518b8868f043b8281819093abdc2271628596fb034dd4155b3f338fc5c191452b559572e9d6f388ffe1f06a5fb9dd4317c4ee9dea2e9b96c47fd1d  qbit_manage-3.6.2_git20230520.tar.gz
+1389641ffea89cccabdfd9169e763cd065db7b74a5298be2432db0aedaa9cae91e4403118034193a0cb655e71f13ae69ff2845d2d028b3309ef4dd076375d877  qbit_manage-3.6.3.tar.gz
 "

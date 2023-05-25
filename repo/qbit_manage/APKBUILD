@@ -2,7 +2,7 @@
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=qbit_manage
 pkgver=3.6.3
-pkgrel=0
+pkgrel=1
 pkgdesc="This tool will help manage tedious tasks in qBittorrent and automate them."
 url="https://github.com/StuffAnThings/qbit_manage"
 arch="noarch"
@@ -15,15 +15,30 @@ depends="
 	py3-ruamel.yaml
 	py3-schedule
 	"
+makedepends="py3-pip py3-virtualenv"
 source="$pkgname-$pkgver.tar.gz::https://github.com/StuffAnThings/qbit_manage/archive/v$pkgver.tar.gz"
 
+build() {
+	python3 -m venv --clear --system-site-packages venv
+	# packages that dont exists in alpine repo or have been forked
+	venv/bin/python3 -m pip install --no-deps --target site-packages \
+		bencodepy
+	# clean
+	find . -name "__pycache__" -type d -exec rm -rf {} +
+}
+
 package() {
+	local pyver="$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
 	local DESTDIR="$pkgdir"/usr/lib/qbit_manage
 
 	install -Dm755 qbit_manage.py -t "$DESTDIR"
 	install -m644 VERSION "$DESTDIR"
 
 	cp -af config modules scripts "$DESTDIR"
+
+	# packages we installed with pip
+	install -dm755 "$pkgdir"/usr/lib/python$pyver/site-packages
+	cp -af site-packages/* "$pkgdir"/usr/lib/python$pyver/site-packages
 }
 
 sha512sums="

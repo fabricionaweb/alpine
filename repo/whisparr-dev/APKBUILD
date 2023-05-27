@@ -3,7 +3,7 @@
 pkgname=whisparr-dev
 _version=2.0.0.157
 pkgver=2.0.0_git20230515
-pkgrel=1
+pkgrel=2
 pkgdesc="Adult download automation for usenet and torrents."
 url="https://github.com/Whisparr/Whisparr"
 arch="x86_64 aarch64 armv7"
@@ -55,28 +55,25 @@ prepare() {
 	local buildprops=src/Directory.Build.props
 	sed -i -e "s/<AssemblyVersion>[0-9.*]\+<\/AssemblyVersion>/<AssemblyVersion>$_version<\/AssemblyVersion>/g" "$buildprops"
 	sed -i -e "s/<AssemblyConfiguration>[\$()A-Za-z-]\+<\/AssemblyConfiguration>/<AssemblyConfiguration>develop<\/AssemblyConfiguration>/g" "$buildprops"
+
+  export BROWSERSLIST_IGNORE_OLD_DATA=true
+	yarn install --frozen-lockfile --network-timeout 120000
 }
 
 build() {
-	# build the package
 	dotnet build src \
 		-p:RuntimeIdentifiers="$_runtime" \
 		-p:Configuration=Release \
 		-p:SelfContained=false \
 		-t:PublishAllRids
-
-	# remove service helpers
-	rm -f "$_artifacts"/ServiceUninstall.*
-	rm -f "$_artifacts"/ServiceInstall.*
-	# remove Whisparr.Windows
-	rm -f "$_artifacts"/Sonarr.Windows.*
-
-	# build web ui
-	export BROWSERSLIST_IGNORE_OLD_DATA=true
-	yarn install --frozen-lockfile --network-timeout 120000
 	yarn build --env production --no-stats
 
-	# move web ui to artifacts folder
+	# cleanup
+	find "$_artifacts" \( \
+		-name "ServiceUninstall.*" -o \
+		-name "ServiceInstall.*" -o \
+		-name "Whisparr.Windows.*" \) -delete
+
 	mv "$_output"/UI "$_artifacts"
 }
 

@@ -2,18 +2,17 @@
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=sabnzbd
 pkgver=4.0.1
-pkgrel=0
+pkgrel=2
 pkgdesc="SABnzbd is a program to download binary files from Usenet servers."
 url="https://sabnzbd.org/"
 arch="noarch"
 license="GPL-2.0-or-later"
-options="net !check" # par2cmdline is a dependency so tests failing, removed to test par2cmdline-turbo fork
 depends="
 	python3
 	7zip
 	unrar
 
-	py3-sabctools
+	py3-sabctools~=7.0
 	py3-cryptography
 	py3-cheetah
 	py3-cherrypy
@@ -25,7 +24,7 @@ depends="
 	py3-guessit
 	py3-orjson
 	py3-setuptools
-	"
+	" # par2cmdline
 checkdepends="
 	py3-virtualenv
 	py3-pip
@@ -40,13 +39,14 @@ checkdepends="
 	py3-importlib-metadata
 	py3-lxml
 	"
-subpackages="$pkgname-openrc"
-install="$pkgname.pre-install"
 source="
 	$pkgname-$pkgver.tar.gz::https://github.com/sabnzbd/sabnzbd/archive/$pkgver.tar.gz
 	sabnzbd.initd
 	sabnzbd.confd
 	"
+install="$pkgname.pre-install"
+subpackages="$pkgname-openrc"
+options="net !check" # tests failing due par2cmdline-turbo fork
 
 prepare() {
 	default_prepare

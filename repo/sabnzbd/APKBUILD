@@ -1,8 +1,8 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=sabnzbd
-pkgver=4.0.1
-pkgrel=2
+pkgver=4.0.2
+pkgrel=0
 pkgdesc="SABnzbd is a program to download binary files from Usenet servers."
 url="https://sabnzbd.org/"
 arch="noarch"
@@ -81,7 +81,7 @@ package() {
 }
 
 sha512sums="
-43dae4694ebd9a1ae978fb358f6c357350ac9e98d6766cd693589f66447cd17d55235fa4382e29fc8089b49fbd5214efeddfe380dca92da3e5f89c013c93cda2  sabnzbd-4.0.1.tar.gz
+1e402bc9c30c097d5050e51d9199ee33efbb465b0c799085aa69ac3590dbba4bd97c2c9cd12e46677dbf3a1881cd95d27e56dfc423f6641ae676d0e8536ecbe3  sabnzbd-4.0.2.tar.gz
 a6bfab8d16318f6f3cabe15ffef6fb022d3270799d080c57d97536d80bfb33f8b7d3df27c31f288a8ab973a669c29dcd3ca4ef76bf5d8c02c3820b2e1a5fad93  sabnzbd.initd
 b0b9e5d01d0984d24a006f70e10a711eadbfb6927cd662343fe7faaac6106618d83e21ffc63d126a55efda188c251356c529e043917d1971bf10334c611e6822  sabnzbd.confd
 "

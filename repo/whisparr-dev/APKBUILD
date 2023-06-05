@@ -1,9 +1,9 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=whisparr-dev
-_version=2.0.0.157
-pkgver=2.0.0_git20230515
-pkgrel=2
+_version=2.0.0.180
+pkgver=2.0.0_git20230703
+pkgrel=0
 pkgdesc="Adult download automation for usenet and torrents."
 url="https://github.com/Whisparr/Whisparr"
 arch="x86_64 aarch64 armv7"
@@ -94,7 +94,7 @@ package() {
 }
 
 sha512sums="
-92eb2ae323e7444b4f7a9356d0ed5844cb3c2deef8f28d4cfc4767686cbf3713c679d4f1c92cb269e74cff530331632317c7d1b579af1c2bc0e0286344d17f69  whisparr-dev-2.0.0_git20230515.tar.gz
+a61a7ee9d09721b2fc4433366579fbb90b9bc97c0c7daa08cfc4ff706bf8456b7f5f5bf01526723a84550ee07b5d79822fbc670cb21c2d0f45c4e83bda682dc8  whisparr-dev-2.0.0_git20230703.tar.gz
 14e0c385b95d1b0e0f37db33abdd39c5818f70899b3ecd7bcd4ef52b35846e4ab2bb602ace2bb33913591282a1845ed214cab707a116181876474778bf82d250  0001-disable-restart.patch
 804012b1701f981aa873b5c22301201cebe40cd213e48b03dd198916243950f0b3adba7166a426e8663df100fba62942b1068088ed92b297c1e95691dcaaa14a  whisparr.initd
 ce8537c20b820b1aa36cc9378249f2576301dd421adf40011ec300eb5093213572d4d4b512e59804eacf3b04698817df360e5a2de1c5451f327de18f48c886ed  whisparr.confd

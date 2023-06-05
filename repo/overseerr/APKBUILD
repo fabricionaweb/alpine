@@ -1,8 +1,8 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=overseerr
-pkgver=1.32.5
-pkgrel=2
+pkgver=1.33.0
+pkgrel=0
 pkgdesc="This tool will help manage tedious tasks in qBittorrent and automate them."
 url="https://overseerr.dev"
 arch="all"
@@ -75,7 +75,7 @@ package() {
 }
 
 sha512sums="
-2796be878ffda91744a2ae0a7858fb167232518c8dc8d1edd19efcdff28a5e41b798d5fa689bfc39845ff36505a4a0394723ec6572d9415bb936535503406f3d  overseerr-1.32.5.tar.gz
+b7992dd76a29a0aa41f94aff7238fa6b71d866160a4809818e059050b6177bb38bfd94c7cc2bbe3ca59a5e531ca384d93923bce4270e9736b8cea996e480fe81  overseerr-1.33.0.tar.gz
 e7a07893b537517a99fe2557db2cdc39732f066991289f2a89aa25740dfceeaa7697f7bdbaf603a61b3d0bce274ecc4de2a23975f9b19cece9e74d1db8ad8f2c  0001-ace-builds-min.patch
 792157e97bbc20494cd732a8a1871491bd05580c63b130c635509b56d4e191821d3663e27fef830c7fe67ba39140d8a8d0f2a727624452fc83dc8320b60d8151  0002-ace-workers.patch
 92de5e26aa4c30d8c4295d5eb26d9d19d2fb8624d583e1230ddfc73f923262b5c207773501a8737bdc5472abfe9cea9105e92f29e4b4350be660cbd967a69088  start.js

@@ -1,8 +1,8 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=cross-seed
-pkgver=5.2.0
-pkgrel=0
+pkgver=5.3.2
+pkgrel=1
 pkgdesc="Fully-automatic cross-seeding with Torznab"
 url="https://github.com/cross-seed/cross-seed"
 arch="all"
@@ -12,8 +12,6 @@ depends="nodejs"
 makedepends="npm python3"
 source="
 	$pkgname-$pkgver.tar.gz::https://github.com/cross-seed/cross-seed/archive/v$pkgver.tar.gz
-	0001-disable-0-indexes-delay.patch::https://github.com/cross-seed/cross-seed/pull/422.patch
-	0002-remove-root-path.patch
 	cross-seed.initd
 	cross-seed.confd
 	"
@@ -59,9 +57,7 @@ package() {
 }
 
 sha512sums="
-98a6fb4528b0069b859925df192b500a9f5262276d129a1685e0a8d3a73c2bdc65af20a0989718829906fdbc1016f2560355ebfd9a161116788d00f8666a5d6e  cross-seed-5.2.0.tar.gz
-ba802f028b1728189c09e8e521d5f2aa5c545225d0e978e9b2a660bb4bbd3f80f7d27cfd226c7700823662bcb446dc47c7c65ef2b044254cafbaa8c7600d6690  0001-disable-0-indexes-delay.patch
-56aa78cd6f4828f739d24809739ac061ea37fee8452124007075dbe7c982472cb9b3512d046a476a8aef1e7ac203bdb54b3b8c32d3def4ef76fb6ee970c18356  0002-remove-root-path.patch
+59cc6107b11e30d43c185217165036cf3bc078a8282d8c5f162727bd0a78d65007eb7fe34abfc526e61ed6a3b7033ede6f29171a5d2378ad651a3fbcfb95567f  cross-seed-5.3.2.tar.gz
 89896849a0d703b76ee6ba05a8db212aac9c5efeb625c3ee6fc552d3dbb85cbb7e906458ab3e86edb46f855afa62314d56e92725a3721f93397bc9e1c4f10d71  cross-seed.initd
 91089033b1b9e768d78471b850af11260d6dcff098880f27b2fe01f33b1deab36afea05e77ab8e76553d5f1dea8d90d53358ae27b5d6bd54f0e7dcf05a4ee8a8  cross-seed.confd
 "

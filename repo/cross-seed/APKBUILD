@@ -1,8 +1,8 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=cross-seed
-pkgver=5.3.2
-pkgrel=1
+pkgver=5.4.0
+pkgrel=0
 pkgdesc="Fully-automatic cross-seeding with Torznab"
 url="https://github.com/cross-seed/cross-seed"
 arch="all"
@@ -57,7 +57,7 @@ package() {
 }
 
 sha512sums="
-59cc6107b11e30d43c185217165036cf3bc078a8282d8c5f162727bd0a78d65007eb7fe34abfc526e61ed6a3b7033ede6f29171a5d2378ad651a3fbcfb95567f  cross-seed-5.3.2.tar.gz
+8c1756b7fbfac9090267d1ae74df7f1a61c33d4a4c32bbfedc229e2739e7e0fc82a93bb58f37716322dae4075486ac75d46cd7e33f9cabf412208598e8fdd5d8  cross-seed-5.4.0.tar.gz
 89896849a0d703b76ee6ba05a8db212aac9c5efeb625c3ee6fc552d3dbb85cbb7e906458ab3e86edb46f855afa62314d56e92725a3721f93397bc9e1c4f10d71  cross-seed.initd
 91089033b1b9e768d78471b850af11260d6dcff098880f27b2fe01f33b1deab36afea05e77ab8e76553d5f1dea8d90d53358ae27b5d6bd54f0e7dcf05a4ee8a8  cross-seed.confd
 "

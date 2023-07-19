@@ -1,7 +1,7 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=tautulli
-pkgver=2.12.4
+pkgver=2.12.5
 pkgrel=0
 _commit=ea6c6078df410f333a060016dfce18c21ad134c9 # refers to the tag
 pkgdesc="A Python based monitoring and tracking tool for Plex Media Server."
@@ -90,7 +90,7 @@ package() {
 }
 
 sha512sums="
-e7833885ecf1d279510600d6ba6d1abb4194d0f6a84c7f994a105b3c16078ab2e953a8c23989055c1b2dbc39836844849e49e3de0ee1fee5913236e193d89015  tautulli-2.12.4.tar.gz
+6f03ff71ee4d84ae63fce176f867a472428050c267f9ed1fa3fb228f7e5426eee8e83970228d65787a35af44da9865cc4fd5ddd8b931d7ececfb62ce7b2dc01c  tautulli-2.12.5.tar.gz
 2d33a636cd3276a3f00bd4f3abf0ac720394bf2fe80155f06266163843f1b65942af9ff9dbc16fac8078b5b98f17441dcd861bc2a75da8ddf513e274a98e0e0b  0001-remove-lib-syspath.patch
 7199927b20c29567121bfafa6b189e18986542476f3cfeb7da145450e7a1d3c0a51e553851da2e6165067190e36bd140f4325f16b304f4095409c31a8caec3ef  0002-disable-analytics.patch
 64dffc470500f8acd41a3291b20058d6fa7511a7b41a4f143331aef1a71509f2e611d2078c203cde03a02915c6443095d62aafd920365a3adc1faac57a9af8af  tautulli.initd

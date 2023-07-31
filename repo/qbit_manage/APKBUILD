@@ -1,7 +1,7 @@
 # Contributor: Fabricio Silva <hi@fabricio.dev>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=qbit_manage
-pkgver=3.6.4
+pkgver=4.0.2
 pkgrel=0
 pkgdesc="This tool will help manage tedious tasks in qBittorrent and automate them."
 url="https://github.com/StuffAnThings/qbit_manage"
@@ -28,5 +28,5 @@ package() {
 }
 
 sha512sums="
-3a0a1b2b3ae8d42181c5ef7ff188f6ad6479aa2adbfb616815b305286a4857dd91b2ff5064020d6cf3a9dd44714a52e9110646a3f312a909b89f1c5f0643a0fd  qbit_manage-3.6.4.tar.gz
+dc6f16c99b0c736490a5e7ce314bd4ee18d265957c59c4a55e321c46729d46c6eecbd51dd53c6ab1177da907707c8023502ae561229a62e79ffb102e5295a392  qbit_manage-4.0.2.tar.gz
 "

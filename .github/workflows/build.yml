@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    paths: ["repo/**"]
+
+jobs:
+  build:
+    runs-on: buildjet-4vcpu-ubuntu-2204
+    container: alpine:3.18
+    steps:
+      # https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Setup deps
+        run: |
+          apk add aports-build
+          adduser --ingroup abuild --disabled-password foo
+          mkdir /home/foo/.abuild
+
+      - name: Setup keys
+        run: |
+          cp hi@fabricio.dev-63f73b9a.rsa.pub /home/foo/.abuild/
+          cp hi@fabricio.dev-63f73b9a.rsa.pub /etc/apk/keys/
+          echo "${{ secrets.APORTS_PRIVATE_KEY }}" > /home/foo/.abuild/hi@fabricio.dev-63f73b9a.rsa
+          echo "PACKAGER_PRIVKEY=/home/foo/.abuild/hi@fabricio.dev-63f73b9a.rsa" > /home/foo/.abuild/abuild.conf
+
+      - name: Change ownership to build
+        run: chown -R foo $(pwd)
+
+      - name: Build repo
+        run: su foo -c 'buildrepo --destdir $(pwd) --aports $(pwd) --purge repo'
+
+      - name: Revert ownership to git
+        run: chown -R root $(pwd)
+
+      - name: Commit new packages
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "upgrade packages"
+          git push

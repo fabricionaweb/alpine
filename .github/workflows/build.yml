@@ -10,17 +10,17 @@ jobs:
     runs-on: buildjet-4vcpu-ubuntu-2204
     container: alpine:3.18
     steps:
-      # https://github.com/actions/checkout
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Setup deps
         run: |
           apk add aports-build
           adduser --ingroup abuild --disabled-password foo
           mkdir /home/foo/.abuild
+
+      # https://github.com/actions/checkout
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Setup keys
         run: |
@@ -42,5 +42,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "upgrade packages"
+          git add -A
+          git commit -m "upgrade packages"
           git push

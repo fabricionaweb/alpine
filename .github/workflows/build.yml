@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    paths: ["repo/**"]
+    paths: ["repo/**", "!repo/x86_64/**"]
   workflow_dispatch:
 
 jobs:

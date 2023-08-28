@@ -1,0 +1,7 @@
+#!/bin/sh
+
+addgroup -S plex 2>/dev/null
+adduser -S -D -h /var/lib/plexmediaserver -s /sbin/nologin -G plex -g plex plex 2>/dev/null
+adduser plex video
+
+exit 0

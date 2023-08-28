@@ -1,0 +1,100 @@
+# Contributor: Fabricio Silva <hi@fabricio.dev>
+# Maintainer: Fabricio Silva <hi@fabricio.dev>
+pkgname=plex-media-server
+_pkgver=1.32.5.7349-8f4248874
+pkgver=${_pkgver%%-*}
+pkgrel=0
+pkgdesc="The back-end media server component of Plex"
+url="https://plex.tv"
+arch="x86_64" # only one due single source
+license="custom"
+options="net !check !tracedeps" # trace deps is linking to gcompat, which breaks
+makedepends="dpkg"
+depends="
+  ca-certificates
+  "
+  # sqlite-libs
+  # ffmpeg-libs
+  # nghttp2-libs
+  # gnu-libiconv-libs
+  # libhdhomerun-libs
+  # intel-gmmlib
+  # opencv-dev
+  # boost-dev
+  # miniupnpc
+  # libusb
+  # libdrm
+  # libva
+  # libtag
+  # libpciaccess
+  # libcrypto3
+  # libcurl
+  # libssl3
+  # fmt
+  # freeimage
+  # editline
+
+subpackages="$pkgname-doc $pkgname-openrc"
+install="$pkgname.pre-install"
+source="
+	$pkgname-$_pkgver.deb::https://downloads.plex.tv/plex-media-server-new/$_pkgver/debian/plexmediaserver_${_pkgver}_amd64.deb
+	$pkgname.initd
+	$pkgname.confd
+	"
+builddir="$srcdir/$pkgname-$_pkgver"
+
+prepare() {
+  default_prepare
+
+  dpkg-deb -x "$srcdir"/$pkgname-$_pkgver.deb "$builddir"
+}
+
+build() {
+  cd usr/lib/plexmediaserver
+
+  # move license
+  mv Resources/LICENSE ../../share/doc/plexmediaserver
+  # move and link cert
+  mv Resources/cacert.pem ../../share
+  ln -s /etc/ssl/certs/ca-cert-Plex.pem Resources/cacert.pem
+
+  # clean up
+  rm -rf etc Resources/start.sh lib/plexmediaserver.*
+
+  # fix ld-musl link
+  ln -sf /lib/ld-musl-x86_64.so.1 lib/ld-musl-x86_64.so.1
+  # this are the same file
+  ln -sf ld-musl-x86_64.so.1 lib/libc.so
+
+  # app is refusing to run if I trace the libs... I belive its due compilation versions
+  # find lib -type f -not \( \
+  #   -name "lib*plex.so*" -o \
+  #   -name "libsoci_*.so*" -o \
+  #   -name "libpion.so*" -o \
+  #   -name "libpython27.so*" -o \
+  #   -name "libc++.so*" \
+  # \) -delete
+
+  # move libs and link
+  # mv lib/*.so* ../
+  # rm -rf lib
+  # ln -s ../ lib
+}
+
+package() {
+  mkdir -p "$pkgdir"/usr/lib
+	cp -af "$builddir"/usr/lib/plexmediaserver "$pkgdir"/usr/lib
+
+  install -Dm644 "$builddir"/usr/share/doc/plexmediaserver/copyright "$pkgdir"/usr/share/licenses/$pkgname/TERMS
+  install -Dm644 "$builddir"/usr/share/doc/plexmediaserver/LICENSE "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+  install -Dm644 "$builddir"/usr/share/cacert.pem "$pkgdir"/etc/ssl/certs/ca-cert-Plex.pem
+
+	install -Dm755 "$srcdir"/$pkgname.initd "$pkgdir"/etc/init.d/plex
+	install -Dm644 "$srcdir"/$pkgname.confd "$pkgdir"/etc/conf.d/plex
+}
+
+sha512sums="
+f28aa6201e2c86805ab25e1c9f373982fd33ac2f3a0ecce26900895ab354f1d422d1a5ca9f2765bc0b1e4827a35192c1614f8fadc6fe69449aa20378dfe50462  plex-media-server-1.32.5.7349-8f4248874.deb
+121771dbb6907652a617672ebe52255782dc82e4c93d4b730c002dab3bbfe384c573e698ba19fbab7eb84e96980dc51b659c15f1943ae9f54a500eb76bd062de  plex-media-server.initd
+c6728f20fef77586641a7ea2541a6ef0e91c68176bf4f4aa54a3d75531c9f33df005f94d4af3606af1b685ffeaf7750817b89a98e23a250002c6d5a2406db6a6  plex-media-server.confd
+"

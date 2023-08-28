@@ -1,0 +1,22 @@
+# Plex Media Server daemon configuration options
+
+command_user="plex:plex" # user:group
+directory="/var/lib/plexmediaserver"
+supervisor="supervise-daemon"
+
+# environments for PMS
+
+# Where Plex keeps its metadata
+export PLEX_MEDIA_SERVER_APPLICATION_SUPPORT_DIR="$directory"
+
+# User that PMS should run as
+export PLEX_MEDIA_SERVER_USER="${command_user%%:*}" # getting value from daemon configuration
+
+# Use syslog for logging instead of sending logs to Plex Media Server.log
+export PLEX_MEDIA_SERVER_USE_SYSLOG=true
+
+# Set Crash Reporting identification variables
+export PLEX_MEDIA_SERVER_INFO_VENDOR="$(grep ^NAME= /etc/os-release | awk -F= '{print $2}' | tr -d \" )"
+export PLEX_MEDIA_SERVER_INFO_DEVICE="PC"
+export PLEX_MEDIA_SERVER_INFO_MODEL="$(uname -m)"
+export PLEX_MEDIA_SERVER_INFO_PLATFORM_VERSION="$(grep ^VERSION= /etc/os-release | awk -F= '{print $2}' | tr -d \" )"

@@ -1,0 +1,21 @@
+#!/sbin/openrc-run
+
+# fallback values for /etc/conf.d/plex
+: ${command_user:=plex:plex}
+: ${directory:=/var/lib/plexmediaserver}
+
+name=plex
+description="Plex Media Server daemon"
+command="/usr/lib/plexmediaserver/Plex\ Media\ Server"
+command_background=true
+
+pidfile="/run/$name.pid"
+
+depend() {
+	need net
+	use dns logger netmount
+}
+
+start_pre() {
+	checkpath -d -o "$command_user" "$directory"
+}

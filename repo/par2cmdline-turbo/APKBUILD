@@ -1,13 +1,13 @@
 # Contributor: Simon Rupf <simon@rupf.net>
 # Maintainer: Fabricio Silva <hi@fabricio.dev>
 pkgname=par2cmdline-turbo
-pkgver=1.0.1
+pkgver=1.1.0
 pkgrel=0
 pkgdesc="par2cmdline x ParPar: speed focused par2cmdline fork"
 url="https://github.com/animetosho/par2cmdline-turbo"
 arch="all !s390x" # tests/unit_tests fails on big endian
 license="GPL-2.0-or-later"
-options="!check" # test failing
+options=""
 makedepends="automake autoconf"
 subpackages="$pkgname-doc"
 source="$pkgname-$pkgver.tar.gz::https://github.com/animetosho/par2cmdline-turbo/archive/v$pkgver.tar.gz"
@@ -21,13 +21,13 @@ prepare() {
 
 build() {
 	./automake.sh
-	./configure --prefix=/usr --enable-openmp
+	./configure --prefix=/usr
 	make
 }
 
 check() {
 	make check
-	make distcheck
+	# make distcheck
 }
 
 package() {
@@ -35,5 +35,5 @@ package() {
 }
 
 sha512sums="
-bc607d08852230df99238b9855577f656b02f53e219651812b3dc864df435eb091aa190e1f567445d57f8b106f0f863f45f578e58599ca78dc1a11f0c7377f25  par2cmdline-turbo-1.0.1.tar.gz
+2999d21d446502ddc6c145dfa9f005d4f6bb5afcf7c40975759214c37936d0def7194c92b21591ee09845de43e8c4fbe14ae9f2a6401fbfe35c523cf2890103c  par2cmdline-turbo-1.1.0.tar.gz
 "
